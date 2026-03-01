@@ -112,15 +112,15 @@ export function Big5Questions({ onComplete }: Big5QuestionsProps) {
   const progress = ((currentIndex + 1) / QUESTIONS.length) * 100;
 
   return (
-    <div className="min-h-screen bg-black text-[#e8e0d4] flex flex-col">
-      {/* Header — RPGステータスバー */}
-      <div className="px-6 py-4">
-        <div className="dq-window-sm px-4 py-3">
+    <div className="bg-black text-[#e8e0d4] flex flex-col gap-6">
+      {/* Header — RPGステータスバー（テキスト切れ防止のため余白確保） */}
+      <div className="px-6 pt-2">
+        <div className="dq-window-sm px-4 py-3.5 min-h-[4.5rem] flex flex-col justify-center">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-pixel-accent text-[#f0c040]">
+            <span className="text-[10px] font-pixel-accent text-[#f0c040] leading-tight">
               STATUS CHECK
             </span>
-            <span className="text-xs text-[#9a9080]">
+            <span className="text-xs text-[#9a9080] tabular-nums">
               {currentIndex + 1} / {QUESTIONS.length}
             </span>
           </div>
@@ -131,8 +131,8 @@ export function Big5Questions({ onComplete }: Big5QuestionsProps) {
         </div>
       </div>
 
-      {/* Question — DQウィンドウ */}
-      <div className="flex-1 flex items-center justify-center px-6 py-8">
+      {/* Question — DQウィンドウ（上揃え・中央寄せなし） */}
+      <div className="px-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -140,7 +140,7 @@ export function Big5Questions({ onComplete }: Big5QuestionsProps) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3 }}
-            className="w-full max-w-lg"
+            className="w-full max-w-lg mx-auto"
           >
             <div className="dq-window px-6 py-5">
               <p className="text-xl font-medium leading-relaxed text-[#e8e0d4]">
@@ -152,7 +152,7 @@ export function Big5Questions({ onComplete }: Big5QuestionsProps) {
       </div>
 
       {/* Options — RPGコマンドリスト */}
-      <div className="px-6 pb-4">
+      <div className="px-6">
         <div className="w-full max-w-lg mx-auto space-y-2">
           {OPTION_KEYS.map((option) => (
             <motion.button
@@ -175,7 +175,7 @@ export function Big5Questions({ onComplete }: Big5QuestionsProps) {
       </div>
 
       {/* Navigation — RPGメニュー風 */}
-      <div className="px-6 pb-8">
+      <div className="px-6 pb-6">
         <div className="w-full max-w-lg mx-auto flex items-center justify-between">
           <button
             onClick={handlePrev}
