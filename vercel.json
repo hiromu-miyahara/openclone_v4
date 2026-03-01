@@ -1,0 +1,5 @@
+{
+  "installCommand": "cd front_mock && npm ci",
+  "buildCommand": "cd front_mock && npm run build",
+  "outputDirectory": "front_mock/dist"
+}
