@@ -3,6 +3,14 @@
 @import './theme.css';
 @import './retro.css';
 
+/* iOS / ノッチ対応: ステータスバー・ホームインジケータとの重なり防止 */
+.safe-area-insets {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
 /* ピクセルアート用画像レンダリング設定 */
 .image-rendering-pixelated {
   image-rendering: pixelated;

@@ -334,7 +334,7 @@ export function Chat() {
     : isSending || isTranscribing;
 
   return (
-    <div className="h-screen bg-black text-[#e8e0d4] flex flex-col relative overflow-hidden" style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
+    <div className="h-screen bg-black text-[#e8e0d4] flex flex-col relative overflow-hidden">
       {/* ─── Header — RPG HUD ─── */}
       <div className="relative z-20 shrink-0 px-4 py-3">
         <div className="dq-window-sm px-4 py-2 flex items-center justify-between">
