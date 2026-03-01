@@ -644,8 +644,8 @@ export function OnboardingFlow() {
         />
       )}
 
-      {/* ── コンテンツ（下部固定） ── */}
-      <div className="relative z-10 max-w-md w-full mt-auto pb-8">
+      {/* ── コンテンツ（全ステージで中央寄せ） ── */}
+      <div className="relative z-10 max-w-md w-full flex-1 flex flex-col justify-center pb-8">
         <AnimatePresence mode="wait">
           {stage === "intro" && (
             <motion.div key="intro" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
