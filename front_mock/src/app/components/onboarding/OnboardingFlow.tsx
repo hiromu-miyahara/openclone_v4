@@ -644,8 +644,14 @@ export function OnboardingFlow() {
         />
       )}
 
-      {/* ── コンテンツ（全ステージで中央寄せ） ── */}
-      <div className="relative z-10 max-w-md w-full flex-1 flex flex-col justify-center pb-8">
+      {/* ── コンテンツ（intro/profile は中央、QUEST3 声の収集以降は上揃え） ── */}
+      <div
+        className={`relative z-10 max-w-md w-full flex-1 flex flex-col pb-8 ${
+          stage === "intro" || stage === "profile"
+            ? "justify-center"
+            : "justify-start pt-4"
+        }`}
+      >
         <AnimatePresence mode="wait">
           {stage === "intro" && (
             <motion.div key="intro" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
