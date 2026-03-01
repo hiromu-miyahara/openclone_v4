@@ -43,16 +43,23 @@ OpenCloneは、個人向け分身AIサービスのフロントエンドモック
 
 ## 💻 起動方法
 
+### デモ・ハッカソン用（フロントのみ・バックエンド未接続）
+
+**デフォルトでモックモード**で動作します。環境変数なしでそのまま起動すれば、バックエンドに接続せずフロントのみでオンボーディング・チャットを体験できます。
+
 ```bash
 # 依存関係のインストール
-pnpm install
+pnpm install   # または npm install
 
 # 開発サーバーの起動
-pnpm dev
+pnpm dev       # または npm run dev
 
-# ビルド
-pnpm build
+# ビルド（Vercel など）
+pnpm build     # または npm run build
 ```
+
+- ランディングで「はじめる」→ オンボーディング → チャットまで全てモックで動作
+- バックエンド接続する場合は `.env` に `VITE_USE_API_MOCK=false` と `VITE_API_BASE_URL` を設定
 
 ## 🎯 アバターアクション
 
