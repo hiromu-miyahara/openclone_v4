@@ -16,49 +16,29 @@ import { PixelAvatar, loadPixelAssets } from "../chat/PixelAvatar";
 import { api } from "../../lib/api";
 import { isApiMock } from "../../lib/utils/env";
 import { showError, showInfo } from "../../lib/utils/toast";
+import { useLanguage } from "../../lib/i18n";
+import type { TranslationKey } from "../../lib/i18n";
 
 type Stage = "intro" | "profile" | "voice" | "big5" | "big5Result" | "generating" | "complete";
 
-const VOICE_SCENES = [
-  {
-    emoji: "🌅",
-    title: "朝の場面",
-    nav: "朝、仕事が始まるところを想像してください。チームに声をかけてみてください。",
-    script: "おはようございます。\n今日もよろしくお願いします。",
-    tone: "ニュートラル / 丁寧",
-  },
-  {
-    emoji: "🎉",
-    title: "驚きの場面",
-    nav: "会議中、予想外にいいニュースが飛び込んできました！",
-    script: "えっ、本当ですか？\nそれはすごいですね！",
-    tone: "驚き / 高揚",
-  },
-  {
-    emoji: "🤔",
-    title: "考え込む場面",
-    nav: "難しい判断を求められています。少し考える時間をもらいましょう。",
-    script: "うーん、ちょっと\n考えさせてください。",
-    tone: "思案 / 低トーン",
-  },
-  {
-    emoji: "🙏",
-    title: "感謝の場面",
-    nav: "誰かがあなたをサポートしてくれました。お礼を伝えましょう。",
-    script: "ありがとうございます。\nとても助かりました。",
-    tone: "感謝 / 温かみ",
-  },
+const VOICE_SCENE_KEYS: { emoji: string; titleKey: TranslationKey; navKey: TranslationKey; scriptKey: TranslationKey; toneKey: TranslationKey }[] = [
+  { emoji: "🌅", titleKey: "voice.scene1.title", navKey: "voice.scene1.nav", scriptKey: "voice.scene1.script", toneKey: "voice.scene1.tone" },
+  { emoji: "🎉", titleKey: "voice.scene2.title", navKey: "voice.scene2.nav", scriptKey: "voice.scene2.script", toneKey: "voice.scene2.tone" },
+  { emoji: "🤔", titleKey: "voice.scene3.title", navKey: "voice.scene3.nav", scriptKey: "voice.scene3.script", toneKey: "voice.scene3.tone" },
+  { emoji: "🙏", titleKey: "voice.scene4.title", navKey: "voice.scene4.nav", scriptKey: "voice.scene4.script", toneKey: "voice.scene4.tone" },
 ];
 
-const STAGE_LABELS: Record<Stage, string> = {
-  intro: "PROLOGUE",
-  profile: "QUEST 1: プロフィール",
-  big5: "QUEST 2: 性格診断",
-  big5Result: "RESULT",
-  voice: "QUEST 3: 声の収集",
-  generating: "GENERATING",
-  complete: "COMPLETE",
-};
+function getStageLabel(stage: Stage, t: (key: TranslationKey) => string): string {
+  switch (stage) {
+    case "intro": return "PROLOGUE";
+    case "profile": return t("onboarding.stageProfile");
+    case "big5": return t("onboarding.stageBig5");
+    case "big5Result": return "RESULT";
+    case "voice": return t("onboarding.stageVoice");
+    case "generating": return "GENERATING";
+    case "complete": return "COMPLETE";
+  }
+}
 
 function getGlowSize(stage: Stage, sceneIndex: number): number {
   switch (stage) {
@@ -66,7 +46,7 @@ function getGlowSize(stage: Stage, sceneIndex: number): number {
     case "profile": return 60;
     case "big5": return 70;
     case "big5Result": return 80;
-    case "voice": return 80 + (sceneIndex / (VOICE_SCENES.length - 1)) * 160;
+    case "voice": return 80 + (sceneIndex / (VOICE_SCENE_KEYS.length - 1)) * 160;
     case "generating": return 280;
     case "complete": return 340;
   }
@@ -74,6 +54,7 @@ function getGlowSize(stage: Stage, sceneIndex: number): number {
 
 /* ─── Intro ─── */
 function IntroContent({ onNext }: { onNext: () => void }) {
+  const { t, lang } = useLanguage();
   const [titleDone, setTitleDone] = useState(false);
   const [subtitleDone, setSubtitleDone] = useState(false);
 
@@ -82,7 +63,8 @@ function IntroContent({ onNext }: { onNext: () => void }) {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.5 }}>
         <h1 className="mb-4 tracking-wide text-[#e8e0d4]">
           <TypewriterText
-            text={"暗闇の先で、\nあなたの分身が目覚めます"}
+            key={`intro-title-${lang}`}
+            text={t("onboarding.introTitle")}
             speed={80}
             delay={800}
             onComplete={() => setTitleDone(true)}
@@ -94,7 +76,8 @@ function IntroContent({ onNext }: { onNext: () => void }) {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
           <p className="text-[#9a9080]">
             <TypewriterText
-              text="ここから、あなたの分身を生み出します"
+              key={`intro-sub-${lang}`}
+              text={t("onboarding.introSubtitle")}
               speed={50}
               delay={200}
               onComplete={() => setSubtitleDone(true)}
@@ -106,7 +89,7 @@ function IntroContent({ onNext }: { onNext: () => void }) {
       {subtitleDone && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
           <Button onClick={onNext} className="w-full max-w-xs mx-auto">
-            はじめる
+            {t("onboarding.introStart")}
           </Button>
         </motion.div>
       )}
@@ -116,6 +99,7 @@ function IntroContent({ onNext }: { onNext: () => void }) {
 
 /* ─── Profile ─── */
 function ProfileContent({ onNext }: { onNext: (photoFile: File) => void }) {
+  const { t, lang } = useLanguage();
   const [name, setName] = useState("");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -133,7 +117,7 @@ function ProfileContent({ onNext }: { onNext: (photoFile: File) => void }) {
 
   const handleNext = () => {
     if (isApiMock()) {
-      localStorage.setItem("onboarding_name", name || "テストユーザー");
+      localStorage.setItem("onboarding_name", name || t("onboarding.testUser"));
       onNext(photoFile ?? new File([], "mock.png", { type: "image/png" }));
       return;
     }
@@ -147,42 +131,42 @@ function ProfileContent({ onNext }: { onNext: (photoFile: File) => void }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
       <h2 className="mb-6 text-center text-[#e8e0d4]">
-        <TypewriterText text="基本情報の入力" speed={80} delay={300} onComplete={() => setTitleDone(true)} />
+        <TypewriterText key={`profile-title-${lang}`} text={t("onboarding.profileTitle")} speed={80} delay={300} onComplete={() => setTitleDone(true)} />
       </h2>
 
       {titleDone && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-[#f0c040]">名前</Label>
+            <Label htmlFor="name" className="text-[#f0c040]">{t("onboarding.nameLabel")}</Label>
             <Input
               id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="あなたの名前を入力してください"
+              placeholder={t("onboarding.namePlaceholder")}
               className="rpg-input rounded-sm px-3 py-2"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-[#f0c040]">顔写真</Label>
+            <Label className="text-[#f0c040]">{t("onboarding.photoLabel")}</Label>
             <div className="dq-window-sm rounded-sm p-8 text-center hover:border-[#f0c040] transition-colors cursor-pointer">
               {photoPreview ? (
                 <div className="space-y-4">
-                  <img src={photoPreview} alt="プレビュー" className="w-32 h-32 object-cover rounded-sm mx-auto border-2 border-[#6a5c3e]" />
+                  <img src={photoPreview} alt="Preview" className="w-32 h-32 object-cover rounded-sm mx-auto border-2 border-[#6a5c3e]" />
                   <label htmlFor="photo-upload" className="cursor-pointer text-sm text-[#9a9080] hover:text-[#f0c040]">
-                    別の写真を選択
+                    {t("onboarding.photoChange")}
                   </label>
                 </div>
               ) : (
                 <label htmlFor="photo-upload" className="cursor-pointer block">
                   <Upload className="w-12 h-12 mx-auto mb-4 text-[#9a9080]" />
-                  <p className="text-[#9a9080]">クリックして写真をアップロード</p>
+                  <p className="text-[#9a9080]">{t("onboarding.photoUpload")}</p>
                 </label>
               )}
               <input id="photo-upload" type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
             </div>
-            <p className="text-sm text-[#9a9080]">顔がはっきり写った写真をお選びください</p>
+            <p className="text-sm text-[#9a9080]">{t("onboarding.photoHint")}</p>
           </div>
 
           <Button
@@ -190,7 +174,7 @@ function ProfileContent({ onNext }: { onNext: (photoFile: File) => void }) {
             disabled={isApiMock() ? false : (!name || !photoPreview || !photoFile)}
             className="w-full mt-8"
           >
-            次へ
+            {t("onboarding.next")}
           </Button>
         </motion.div>
       )}
@@ -206,6 +190,7 @@ function VoiceContent({
   currentScene: number;
   onSceneComplete: () => void;
 }) {
+  const { t, lang } = useLanguage();
   const [isRecording, setIsRecording] = useState(false);
   const [recorded, setRecorded] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -215,7 +200,7 @@ function VoiceContent({
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
 
-  const scene = VOICE_SCENES[currentScene];
+  const sceneKeys = VOICE_SCENE_KEYS[currentScene];
 
   useEffect(() => {
     setIsRecording(false);
@@ -246,7 +231,7 @@ function VoiceContent({
       mr.start();
       setIsRecording(true);
     } catch {
-      setError("マイクへのアクセスが拒否されました");
+      setError(t("voice.micError"));
     }
   };
 
@@ -275,7 +260,7 @@ function VoiceContent({
         setRecorded(true);
       }
     } catch {
-      setError("音声のアップロードに失敗しました");
+      setError(t("voice.uploadError"));
     } finally {
       setUploading(false);
     }
@@ -289,7 +274,7 @@ function VoiceContent({
     }
   };
 
-  const progress = ((currentScene + 1) / VOICE_SCENES.length) * 100;
+  const progress = ((currentScene + 1) / VOICE_SCENE_KEYS.length) * 100;
 
   return (
     <motion.div
@@ -300,9 +285,9 @@ function VoiceContent({
     >
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-xs text-[#9a9080]">{scene.tone}</span>
+          <span className="text-xs text-[#9a9080]">{t(sceneKeys.toneKey)}</span>
           <span className="text-sm text-[#f0c040] font-pixel-accent" style={{ fontSize: '10px' }}>
-            {currentScene + 1}/{VOICE_SCENES.length}
+            {currentScene + 1}/{VOICE_SCENE_KEYS.length}
           </span>
         </div>
         {/* HPバー風プログレス */}
@@ -315,8 +300,8 @@ function VoiceContent({
       <div className="dq-window-sm rounded-sm p-4 mb-3">
         <p className="text-sm text-[#9a9080]">
           <TypewriterText
-            key={`nav-${currentScene}`}
-            text={scene.nav}
+            key={`nav-${currentScene}-${lang}`}
+            text={t(sceneKeys.navKey)}
             speed={35}
             delay={200}
             onComplete={() => setNavReady(true)}
@@ -328,10 +313,10 @@ function VoiceContent({
       {navReady && (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <div className="dq-window rounded-sm p-6 mb-4 text-center">
-            <div className="text-2xl mb-3">{scene.emoji}</div>
-            <p className="text-xs text-[#9a9080] mb-2">{scene.title}</p>
+            <div className="text-2xl mb-3">{sceneKeys.emoji}</div>
+            <p className="text-xs text-[#9a9080] mb-2">{t(sceneKeys.titleKey)}</p>
             <p className="text-[#e8e0d4] text-lg leading-relaxed whitespace-pre-line font-medium">
-              「{scene.script}」
+              「{t(sceneKeys.scriptKey)}」
             </p>
           </div>
 
@@ -358,12 +343,12 @@ function VoiceContent({
 
             <p className="text-center text-sm text-[#9a9080]">
               {uploading
-                ? "アップロード中..."
+                ? t("voice.uploading")
                 : isRecording
-                ? "🎙 録音中… もう一度押して停止"
+                ? t("voice.recording")
                 : recorded
-                ? "録音完了！ 次へ進んでください"
-                : "マイクボタンを押して読んでください"}
+                ? t("voice.recorded")
+                : t("voice.instruction")}
             </p>
 
             {error && <p className="text-center text-sm text-[#ff4444]">{error}</p>}
@@ -373,7 +358,7 @@ function VoiceContent({
               disabled={isApiMock() ? false : !recorded}
               className="w-full"
             >
-              {currentScene < VOICE_SCENES.length - 1 ? "次の場面へ" : "録音完了"}
+              {currentScene < VOICE_SCENE_KEYS.length - 1 ? t("voice.nextScene") : t("voice.complete")}
             </Button>
           </div>
         </motion.div>
@@ -384,6 +369,7 @@ function VoiceContent({
 
 /* ─── Complete（アバター登場）─── */
 function CompleteContent({ onStart }: { onStart: () => void }) {
+  const { t, lang } = useLanguage();
   const [avatarReady, setAvatarReady] = useState(false);
   const [titleDone, setTitleDone] = useState(false);
   const [subtitleDone, setSubtitleDone] = useState(false);
@@ -415,7 +401,8 @@ function CompleteContent({ onStart }: { onStart: () => void }) {
         >
           <h2 className="text-[#e8e0d4]">
             <TypewriterText
-              text={"あなたの分身は、\nこの世界に生まれました"}
+              key={`complete-title-${lang}`}
+              text={t("onboarding.completeTitle")}
               speed={80}
               delay={300}
               onComplete={() => setTitleDone(true)}
@@ -426,7 +413,8 @@ function CompleteContent({ onStart }: { onStart: () => void }) {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
               <p className="text-[#9a9080]">
                 <TypewriterText
-                  text={"準備ができました。\n会話を始めましょう。"}
+                  key={`complete-sub-${lang}`}
+                  text={t("onboarding.completeSubtitle")}
                   speed={50}
                   delay={200}
                   onComplete={() => setSubtitleDone(true)}
@@ -438,7 +426,7 @@ function CompleteContent({ onStart }: { onStart: () => void }) {
           {subtitleDone && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
               <Button onClick={onStart} className="w-full max-w-xs mx-auto mt-4">
-                ▶ 会話をはじめる
+                {t("onboarding.startChat")}
               </Button>
             </motion.div>
           )}
@@ -451,6 +439,7 @@ function CompleteContent({ onStart }: { onStart: () => void }) {
 /* ═══ Main Flow ═══ */
 export function OnboardingFlow() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [stage, setStage] = useState<Stage>("intro");
   const [sceneIndex, setSceneIndex] = useState(0);
   const [big5Answers, setBig5Answers] = useState<Big5Answer[]>([]);
@@ -476,11 +465,11 @@ export function OnboardingFlow() {
         return;
       }
       if (status.status === "failed") {
-        throw new Error(status.error_message ?? "ピクセルアニメーション生成に失敗しました");
+        throw new Error(status.error_message ?? "Pixel animation generation failed");
       }
       await new Promise((resolve) => setTimeout(resolve, 3000));
     }
-    throw new Error("ピクセルアニメーション生成がタイムアウトしました");
+    throw new Error("Pixel animation generation timed out");
   }, []);
 
   const pollVoiceCloneReady = useCallback(async (jobId: string): Promise<void> => {
@@ -488,11 +477,11 @@ export function OnboardingFlow() {
       const status = await api.onboarding.getVoiceCloneStatus(jobId);
       if (status.status === "ready") return;
       if (status.status === "failed") {
-        throw new Error(status.error_message ?? "Voice Clone作成に失敗しました");
+        throw new Error(status.error_message ?? "Voice Clone creation failed");
       }
       await new Promise((resolve) => setTimeout(resolve, 3000));
     }
-    throw new Error("Voice Clone作成がタイムアウトしました");
+    throw new Error("Voice Clone creation timed out");
   }, []);
 
   useEffect(() => {
@@ -555,7 +544,7 @@ export function OnboardingFlow() {
   }, [stage, backendStarted, onboardingSessionId, profilePhotoFile, pollPixelCompleted, pollVoiceCloneReady, big5Answers]);
 
   const handleSceneComplete = useCallback(() => {
-    if (sceneIndex < VOICE_SCENES.length - 1) {
+    if (sceneIndex < VOICE_SCENE_KEYS.length - 1) {
       setSceneIndex((prev) => prev + 1);
     } else {
       setStage("big5");
@@ -564,11 +553,11 @@ export function OnboardingFlow() {
 
   const handleGeneratingComplete = useCallback(() => {
     if (!backendReady) {
-      showInfo("生成処理中です。完了までお待ちください。");
+      showInfo(t("onboarding.generating"));
       return;
     }
     setStage("complete");
-  }, [backendReady]);
+  }, [backendReady, t]);
 
   const handleBig5Complete = useCallback((answers: Big5Answer[]) => {
     setBig5Answers(answers);
@@ -616,7 +605,7 @@ export function OnboardingFlow() {
         >
           <div className="dq-window-sm mx-4 mt-4 px-4 py-2 flex items-center justify-between">
             <span className="text-[10px] font-pixel-accent text-[#f0c040]">
-              {STAGE_LABELS[stage]}
+              {getStageLabel(stage, t)}
             </span>
             <span className="text-xs text-[#9a9080]">OpenClone</span>
           </div>
@@ -645,15 +634,7 @@ export function OnboardingFlow() {
         />
       )}
 
-      {/* 完了時のフラッシュ */}
-      {stage === "complete" && (
-        <motion.div
-          className="absolute inset-0 bg-[#f0c040] pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.08 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-        />
-      )}
+      {/* 完了時のフラッシュ（背景を純黒に保つため無効化） */}
 
       {/* ── 生成待ち全画面ストーリーページ ── */}
       {stage === "generating" && (

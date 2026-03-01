@@ -3,52 +3,54 @@
  */
 import { motion } from "motion/react";
 import type { Answer } from "./Big5Questions";
+import { useLanguage } from "../../lib/i18n";
+import type { TranslationKey } from "../../lib/i18n";
 
 type PersonalityType = "leader" | "supporter" | "creator" | "analyst" | "communicator" | "balanced";
 
 interface TypeMeta {
   id: PersonalityType;
-  title: string;
-  description: string;
+  titleKey: TranslationKey;
+  descKey: TranslationKey;
   tone: string;
 }
 
 const TYPE_META: TypeMeta[] = [
   {
     id: "leader",
-    title: "リーダー型",
-    description: "決断力があり、目標達成に向けて周囲を巻き込む力があるタイプです。",
+    titleKey: "big5result.leader.title",
+    descKey: "big5result.leader.desc",
     tone: "Energy高 / Directness高 / Formality中〜高",
   },
   {
     id: "supporter",
-    title: "サポーター型",
-    description: "穏やかで信頼感があり、共感力を持って相手を支えるタイプです。",
+    titleKey: "big5result.supporter.title",
+    descKey: "big5result.supporter.desc",
     tone: "Warmth高 / Energy中 / Directness低",
   },
   {
     id: "creator",
-    title: "クリエイター型",
-    description: "好奇心が高く、新しいアイデアを積極的に発信するタイプです。",
+    titleKey: "big5result.creator.title",
+    descKey: "big5result.creator.desc",
     tone: "Energy高 / Formality低 / Warmth中",
   },
   {
     id: "analyst",
-    title: "アナリスト型",
-    description: "論理的かつ緻密に情報を整理し、計画的に物事を進めるタイプです。",
+    titleKey: "big5result.analyst.title",
+    descKey: "big5result.analyst.desc",
     tone: "Directness高 / Formality高 / Energy中",
   },
   {
     id: "communicator",
-    title: "コミュニケーター型",
-    description: "社交的で場の空気を読み、対話で人をつなぐタイプです。",
+    titleKey: "big5result.communicator.title",
+    descKey: "big5result.communicator.desc",
     tone: "Warmth高 / Energy高 / Formality低",
   },
   {
     id: "balanced",
-    title: "バランス型",
-    description: "状況に応じて柔軟に振る舞える、安定したタイプです。",
-    tone: "全パラメータ中程度",
+    titleKey: "big5result.balanced.title",
+    descKey: "big5result.balanced.desc",
+    tone: "All parameters moderate",
   },
 ];
 
@@ -103,11 +105,12 @@ interface Big5ResultProps {
 }
 
 export function Big5Result({ answers, onComplete }: Big5ResultProps) {
+  const { t } = useLanguage();
   const typeId = classifyType(calculateNormalizedScores(answers));
   const typeMeta = TYPE_META.find((v) => v.id === typeId)!;
 
   return (
-    <div className="min-h-screen bg-[#08081a] text-[#e8e0d4] flex flex-col">
+    <div className="min-h-screen bg-black text-[#e8e0d4] flex flex-col">
       {/* Header */}
       <div className="px-6 py-4">
         <div className="dq-window-sm px-4 py-2">
@@ -133,7 +136,7 @@ export function Big5Result({ answers, onComplete }: Big5ResultProps) {
               ★
             </motion.div>
             <p className="text-sm text-[#9a9080]">
-              あなたの性格タイプが判定されました
+              {t("big5result.determined")}
             </p>
           </motion.div>
 
@@ -145,13 +148,13 @@ export function Big5Result({ answers, onComplete }: Big5ResultProps) {
           >
             <div className="dq-window p-6 space-y-4">
               <div>
-                <p className="text-xs text-[#9a9080] mb-1">─ 称号 ─</p>
-                <h3 className="text-2xl font-semibold text-[#f0c040] title-glow">{typeMeta.title}</h3>
+                <p className="text-xs text-[#9a9080] mb-1">{t("big5result.classLabel")}</p>
+                <h3 className="text-2xl font-semibold text-[#f0c040] title-glow">{t(typeMeta.titleKey)}</h3>
               </div>
-              <p className="text-sm leading-7 text-[#e8e0d4]">{typeMeta.description}</p>
+              <p className="text-sm leading-7 text-[#e8e0d4]">{t(typeMeta.descKey)}</p>
               <div className="dq-window-sm px-3 py-2 mt-2">
                 <p className="text-xs text-[#9a9080]">
-                  応答トーン: <span className="text-[#e8e0d4]">{typeMeta.tone}</span>
+                  {t("big5result.toneLabel")} <span className="text-[#e8e0d4]">{typeMeta.tone}</span>
                 </p>
               </div>
             </div>
@@ -166,7 +169,7 @@ export function Big5Result({ answers, onComplete }: Big5ResultProps) {
             onClick={onComplete}
             className="rpg-btn-primary w-full py-3 text-sm font-medium"
           >
-            ▶ ぼうけんにでる
+            {t("big5result.go")}
           </button>
         </div>
       </div>

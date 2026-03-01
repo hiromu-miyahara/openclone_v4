@@ -21,20 +21,22 @@ import { api } from "../../lib/api";
 import { useAudioRecorder } from "../../lib/hooks/useAudioRecorder";
 import { isApiMock } from "../../lib/utils/env";
 import { showError } from "../../lib/utils/toast";
+import { useLanguage } from "../../lib/i18n";
+import type { Lang } from "../../lib/i18n";
 import type { ChatMessage } from "../../lib/api/types";
 
 type ChatState = "idle" | "listening" | "thinking" | "responding" | "playingVoice";
 
-// モック用データ
-const MOCK_RESPONSES = [
-  { text: "それ、いいね！まずは小さく試してみよう。", actions: ["agree", "speaking"] as const },
-  { text: "なるほど、そういう考え方もあるんだね。", actions: ["nod", "speaking"] as const },
-  { text: "わかる！僕もそう思う！", actions: ["emphasis", "speaking"] as const },
-  { text: "へぇ、それは意外だな。", actions: ["surprised", "speaking"] as const },
-  { text: "それは少し寂しいね。無理しすぎないで。", actions: ["melancholy", "speaking"] as const },
-  { text: "いい流れ！この調子で進もう。", actions: ["joy", "speaking"] as const },
-  { text: "それはちょっと違うかも。もう一度整理しよう。", actions: ["anger", "speaking"] as const },
-  { text: "そうだね、一緒に考えてみよう。", actions: ["thinking", "speaking"] as const },
+// モック用データ（多言語対応）
+const MOCK_RESPONSES: { text: Record<Lang, string>; actions: readonly [string, "speaking"] }[] = [
+  { text: { ja: "それ、いいね！まずは小さく試してみよう。", en: "That's great! Let's start small and give it a try." }, actions: ["agree", "speaking"] },
+  { text: { ja: "なるほど、そういう考え方もあるんだね。", en: "I see, that's an interesting way to think about it." }, actions: ["nod", "speaking"] },
+  { text: { ja: "わかる！僕もそう思う！", en: "I get it! I think so too!" }, actions: ["emphasis", "speaking"] },
+  { text: { ja: "へぇ、それは意外だな。", en: "Huh, that's surprising." }, actions: ["surprised", "speaking"] },
+  { text: { ja: "それは少し寂しいね。無理しすぎないで。", en: "That's a bit sad. Don't push yourself too hard." }, actions: ["melancholy", "speaking"] },
+  { text: { ja: "いい流れ！この調子で進もう。", en: "Great momentum! Let's keep it going." }, actions: ["joy", "speaking"] },
+  { text: { ja: "それはちょっと違うかも。もう一度整理しよう。", en: "That might not be quite right. Let's sort it out again." }, actions: ["anger", "speaking"] },
+  { text: { ja: "そうだね、一緒に考えてみよう。", en: "Yeah, let's think about it together." }, actions: ["thinking", "speaking"] },
 ];
 
 // モック用Message型（isNew拡張）
@@ -49,6 +51,7 @@ type MockMessage = {
 export function Chat() {
   const navigate = useNavigate();
   const useMock = isApiMock();
+  const { lang, setLang, t } = useLanguage();
 
   // ピクセルアートアセットをlocalStorageから取得
   const [pixelAssets] = useState(() => loadPixelAssets());
@@ -79,7 +82,7 @@ export function Chat() {
     {
       id: "1",
       role: "assistant",
-      text: "こんにちは！あなたの分身です。\n何でも話しかけてください。",
+      text: t("chat.greeting"),
       actions: ["speaking"],
       isNew: true,
     },
@@ -168,7 +171,7 @@ export function Chat() {
         const assistantMsg: MockMessage = {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          text: resp.text,
+          text: resp.text[lang],
           actions: resp.actions,
           isNew: true,
         };
@@ -181,7 +184,7 @@ export function Chat() {
       await apiSendMessage(inputText);
       setInputText("");
     }
-  }, [inputText, useMock, apiSendMessage]);
+  }, [inputText, useMock, apiSendMessage, lang]);
 
   // 音声録音ハンドラ
   const handleRecord = async () => {
@@ -198,7 +201,7 @@ export function Chat() {
           const userMsg: MockMessage = {
             id: Date.now().toString(),
             role: "user",
-            text: "これは音声入力のテストです",
+            text: lang === "ja" ? "これは音声入力のテストです" : "This is a voice input test",
             actions: ["speaking"],
           };
           setMockMessages((prev) => [...prev, userMsg]);
@@ -208,7 +211,7 @@ export function Chat() {
             const assistantMsg: MockMessage = {
               id: (Date.now() + 1).toString(),
               role: "assistant",
-              text: resp.text,
+              text: resp.text[lang],
               actions: resp.actions,
               isNew: true,
             };
@@ -331,7 +334,7 @@ export function Chat() {
     : isSending || isTranscribing;
 
   return (
-    <div className="h-screen bg-black text-[#e8e0d4] flex flex-col relative overflow-hidden">
+    <div className="h-screen bg-black text-[#e8e0d4] flex flex-col relative overflow-hidden" style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}>
       {/* ─── Header — RPG HUD ─── */}
       <div className="relative z-20 shrink-0 px-4 py-3">
         <div className="dq-window-sm px-4 py-2 flex items-center justify-between">
@@ -362,14 +365,14 @@ export function Chat() {
                   className="w-full px-4 py-2.5 flex items-center gap-2.5 text-sm text-[#e8e0d4] hover:bg-[#1a1a3a] transition-colors"
                 >
                   <MessageSquare className="w-4 h-4 text-[#9a9080]" />
-                  <span>チャット履歴</span>
+                  <span>{t("menu.chatHistory")}</span>
                 </button>
                 <button
                   onClick={() => { setShowMenu(false); setShowSettings(true); }}
                   className="w-full px-4 py-2.5 flex items-center gap-2.5 text-sm text-[#e8e0d4] hover:bg-[#1a1a3a] transition-colors"
                 >
                   <Settings className="w-4 h-4 text-[#9a9080]" />
-                  <span>設定</span>
+                  <span>{t("menu.settings")}</span>
                 </button>
               </motion.div>
             </div>
@@ -440,7 +443,7 @@ export function Chat() {
                       } disabled:opacity-40`}
                     >
                       <Volume2 className="w-3.5 h-3.5" />
-                      <span>{playingMessageId === latestAssistant.id ? "再生中..." : "音声再生"}</span>
+                      <span>{playingMessageId === latestAssistant.id ? t("chat.playingVoice") : t("chat.playVoice")}</span>
                     </button>
                   )}
                 </div>
@@ -471,7 +474,7 @@ export function Chat() {
                 animate={{ opacity: [1, 0.5, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
-                録音中...
+                {t("chat.recording")}
               </motion.p>
             </div>
           ) : isTranscribing ? (
@@ -482,7 +485,7 @@ export function Chat() {
                 animate={{ opacity: [1, 0.5, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
-                音声認識中...
+                {t("chat.transcribing")}
               </motion.p>
             </div>
           ) : (
@@ -496,7 +499,7 @@ export function Chat() {
                     if (e.key === "Enter" && !e.nativeEvent.isComposing) handleSend();
                   }}
                   onFocus={() => setShowDialog(false)}
-                  placeholder="メッセージを入力..."
+                  placeholder={t("chat.inputPlaceholder")}
                   disabled={isInputDisabled}
                   className="flex-1 h-full px-3 text-sm bg-transparent border-none outline-none text-[#e8e0d4] placeholder-[#9a9080]/60"
                 />
@@ -543,14 +546,14 @@ export function Chat() {
               onClick={() => setShowHistory(false)}
             />
             <motion.div
-              className="absolute top-0 right-0 bottom-0 w-[85%] max-w-sm bg-[#08081a] border-l-3 border-[#6a5c3e] z-40 flex flex-col"
+              className="absolute top-0 right-0 bottom-0 w-[85%] max-w-sm bg-black border-l-3 border-[#6a5c3e] z-40 flex flex-col"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 250 }}
             >
               <div className="flex items-center justify-between p-4 border-b-2 border-[#6a5c3e]">
-                <h2 className="text-[#f0c040] font-pixel-accent text-xs">チャット履歴</h2>
+                <h2 className="text-[#f0c040] font-pixel-accent text-xs">{t("history.title")}</h2>
                 <button
                   onClick={() => setShowHistory(false)}
                   className="p-1 text-[#9a9080] hover:text-[#f0c040] transition-colors"
@@ -566,7 +569,7 @@ export function Chat() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9a9080]" />
                     <input
                       type="text"
-                      placeholder="会話を検索..."
+                      placeholder={t("history.searchPlaceholder")}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="rpg-input w-full h-10 pl-10 pr-3 text-sm"
@@ -586,7 +589,7 @@ export function Chat() {
 
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {messages.length === 0 ? (
-                  <p className="text-sm text-[#9a9080] text-center py-8">まだ冒険の記録がありません</p>
+                  <p className="text-sm text-[#9a9080] text-center py-8">{t("history.empty")}</p>
                 ) : (
                   messages.map((msg) => (
                     <div
@@ -600,7 +603,7 @@ export function Chat() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           <p className="text-[10px] text-[#9a9080] mb-1">
-                            {msg.role === "user" ? "あなた" : "分身"}
+                            {msg.role === "user" ? t("history.you") : t("history.clone")}
                           </p>
                           <p className="text-sm text-[#e8e0d4] break-words">{msg.text}</p>
                           {/* TTS in history too */}
@@ -614,7 +617,7 @@ export function Chat() {
                               className="mt-1.5 flex items-center gap-1 text-xs text-[#9a9080] hover:text-[#f0c040] transition-colors disabled:opacity-40"
                             >
                               <Volume2 className="w-3 h-3" />
-                              <span>{playingMessageId === msg.id ? "再生中..." : "再生"}</span>
+                              <span>{playingMessageId === msg.id ? t("chat.playingVoice") : t("history.play")}</span>
                             </button>
                           )}
                         </div>
@@ -622,7 +625,7 @@ export function Chat() {
                         {/* 削除ボタン（ホバー時のみ表示） */}
                         <button
                           onClick={() => {
-                            if (confirm("このメッセージを削除しますか？")) {
+                            if (confirm(t("history.deleteConfirm"))) {
                               handleDeleteMessage(msg.id);
                             }
                           }}
@@ -665,7 +668,7 @@ export function Chat() {
               transition={{ type: "spring", damping: 25, stiffness: 250 }}
             >
               <div className="flex items-center justify-between p-4 border-b-2 border-[#6a5c3e]">
-                <h2 className="text-[#f0c040] font-pixel-accent text-xs">設定</h2>
+                <h2 className="text-[#f0c040] font-pixel-accent text-xs">{t("settings.title")}</h2>
                 <button
                   onClick={() => setShowSettings(false)}
                   className="p-1 text-[#9a9080] hover:text-[#f0c040] transition-colors"
@@ -675,16 +678,45 @@ export function Chat() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                {/* 言語設定 */}
+                <div className="space-y-3">
+                  <h3 className="text-xs text-[#f0c040] font-pixel-accent">{t("settings.language")}</h3>
+                  <div className="dq-window-sm p-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setLang("ja")}
+                        className={`flex-1 py-2 text-sm rounded-sm transition-colors ${
+                          lang === "ja"
+                            ? "bg-[#f0c040] text-black font-bold"
+                            : "bg-[#1a1a3a] text-[#9a9080] hover:text-[#e8e0d4]"
+                        }`}
+                      >
+                        日本語
+                      </button>
+                      <button
+                        onClick={() => setLang("en")}
+                        className={`flex-1 py-2 text-sm rounded-sm transition-colors ${
+                          lang === "en"
+                            ? "bg-[#f0c040] text-black font-bold"
+                            : "bg-[#1a1a3a] text-[#9a9080] hover:text-[#e8e0d4]"
+                        }`}
+                      >
+                        English
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 {/* 音声設定 */}
                 <div className="space-y-3">
-                  <h3 className="text-xs text-[#f0c040] font-pixel-accent">音声</h3>
+                  <h3 className="text-xs text-[#f0c040] font-pixel-accent">{t("settings.voice")}</h3>
                   <div className="dq-window-sm p-3 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#e8e0d4]">音声応答</span>
+                      <span className="text-sm text-[#e8e0d4]">{t("settings.voiceResponse")}</span>
                       <span className="text-xs text-[#9a9080]">ON</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#e8e0d4]">音量</span>
+                      <span className="text-sm text-[#e8e0d4]">{t("settings.volume")}</span>
                       <div className="w-24 h-2 bg-[#1a1a3a] rounded-full overflow-hidden">
                         <div className="w-3/4 h-full bg-[#f0c040] rounded-full" />
                       </div>
@@ -694,14 +726,14 @@ export function Chat() {
 
                 {/* 表示設定 */}
                 <div className="space-y-3">
-                  <h3 className="text-xs text-[#f0c040] font-pixel-accent">表示</h3>
+                  <h3 className="text-xs text-[#f0c040] font-pixel-accent">{t("settings.display")}</h3>
                   <div className="dq-window-sm p-3 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#e8e0d4]">テキスト速度</span>
-                      <span className="text-xs text-[#9a9080]">普通</span>
+                      <span className="text-sm text-[#e8e0d4]">{t("settings.textSpeed")}</span>
+                      <span className="text-xs text-[#9a9080]">{t("settings.textSpeedNormal")}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#e8e0d4]">アバターアニメ</span>
+                      <span className="text-sm text-[#e8e0d4]">{t("settings.avatarAnimation")}</span>
                       <span className="text-xs text-[#9a9080]">ON</span>
                     </div>
                   </div>
@@ -709,11 +741,11 @@ export function Chat() {
 
                 {/* アカウント */}
                 <div className="space-y-3">
-                  <h3 className="text-xs text-[#f0c040] font-pixel-accent">アカウント</h3>
+                  <h3 className="text-xs text-[#f0c040] font-pixel-accent">{t("settings.account")}</h3>
                   <div className="dq-window-sm p-3 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#e8e0d4]">ユーザー</span>
-                      <span className="text-xs text-[#9a9080]">{useMock ? "テストユーザー" : "—"}</span>
+                      <span className="text-sm text-[#e8e0d4]">{t("settings.user")}</span>
+                      <span className="text-xs text-[#9a9080]">{useMock ? t("settings.testUser") : "—"}</span>
                     </div>
                   </div>
                 </div>
@@ -733,9 +765,10 @@ export function Chat() {
 
 /* ─── Thinking Dots ─── */
 function ThinkingDots() {
+  const { t } = useLanguage();
   return (
     <div className="flex items-center gap-1 text-[#9a9080]">
-      <span>考え中</span>
+      <span>{t("chat.thinking")}</span>
       <motion.span
         animate={{ opacity: [0, 1, 0] }}
         transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}

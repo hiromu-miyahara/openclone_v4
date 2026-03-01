@@ -5,6 +5,8 @@ import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
 import ChevronLeft from "lucide-react/dist/esm/icons/chevron-left";
+import { useLanguage } from "../../lib/i18n";
+import type { TranslationKey } from "../../lib/i18n";
 
 export type Big5Factor =
   | "openness"
@@ -16,7 +18,7 @@ export type Big5Factor =
 export interface Question {
   id: number;
   factor: Big5Factor;
-  text: string;
+  textKey: TranslationKey;
   reverse: boolean;
 }
 
@@ -27,26 +29,26 @@ export interface Answer {
 }
 
 const QUESTIONS: Question[] = [
-  { id: 1, factor: "extraversion", text: "活発で、外向的だと思う", reverse: false },
-  { id: 2, factor: "agreeableness", text: "他人に不満をもち、もめごとを起こしやすいと思う", reverse: true },
-  { id: 3, factor: "conscientiousness", text: "しっかりしていて、自分に厳しいと思う", reverse: false },
-  { id: 4, factor: "neuroticism", text: "心配性で、うろたえやすいと思う", reverse: false },
-  { id: 5, factor: "openness", text: "新しいことが好きで、変わった考えをもつと思う", reverse: false },
-  { id: 6, factor: "extraversion", text: "ひかえめで、おとなしいと思う", reverse: true },
-  { id: 7, factor: "agreeableness", text: "人に気をつかう、やさしい人間だと思う", reverse: false },
-  { id: 8, factor: "conscientiousness", text: "だらしなく、うっかりしていると思う", reverse: true },
-  { id: 9, factor: "neuroticism", text: "冷静で、気分が安定していると思う", reverse: true },
-  { id: 10, factor: "openness", text: "発想力に欠けた、平凡な人間だと思う", reverse: true },
+  { id: 1, factor: "extraversion", textKey: "big5.q1", reverse: false },
+  { id: 2, factor: "agreeableness", textKey: "big5.q2", reverse: true },
+  { id: 3, factor: "conscientiousness", textKey: "big5.q3", reverse: false },
+  { id: 4, factor: "neuroticism", textKey: "big5.q4", reverse: false },
+  { id: 5, factor: "openness", textKey: "big5.q5", reverse: false },
+  { id: 6, factor: "extraversion", textKey: "big5.q6", reverse: true },
+  { id: 7, factor: "agreeableness", textKey: "big5.q7", reverse: false },
+  { id: 8, factor: "conscientiousness", textKey: "big5.q8", reverse: true },
+  { id: 9, factor: "neuroticism", textKey: "big5.q9", reverse: true },
+  { id: 10, factor: "openness", textKey: "big5.q10", reverse: true },
 ];
 
-const OPTIONS = [
-  { value: 1, label: "全く違うと思う" },
-  { value: 2, label: "おおかた違うと思う" },
-  { value: 3, label: "少し違うと思う" },
-  { value: 4, label: "どちらでもない" },
-  { value: 5, label: "少しそう思う" },
-  { value: 6, label: "おおかたそう思う" },
-  { value: 7, label: "強くそう思う" },
+const OPTION_KEYS: { value: number; labelKey: TranslationKey }[] = [
+  { value: 1, labelKey: "big5.opt1" },
+  { value: 2, labelKey: "big5.opt2" },
+  { value: 3, labelKey: "big5.opt3" },
+  { value: 4, labelKey: "big5.opt4" },
+  { value: 5, labelKey: "big5.opt5" },
+  { value: 6, labelKey: "big5.opt6" },
+  { value: 7, labelKey: "big5.opt7" },
 ];
 
 interface Big5QuestionsProps {
@@ -54,6 +56,7 @@ interface Big5QuestionsProps {
 }
 
 export function Big5Questions({ onComplete }: Big5QuestionsProps) {
+  const { t } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<number, number>>(new Map());
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
@@ -109,7 +112,7 @@ export function Big5Questions({ onComplete }: Big5QuestionsProps) {
   const progress = ((currentIndex + 1) / QUESTIONS.length) * 100;
 
   return (
-    <div className="min-h-screen bg-[#08081a] text-[#e8e0d4] flex flex-col">
+    <div className="min-h-screen bg-black text-[#e8e0d4] flex flex-col">
       {/* Header — RPGステータスバー */}
       <div className="px-6 py-4">
         <div className="dq-window-sm px-4 py-3">
@@ -141,7 +144,7 @@ export function Big5Questions({ onComplete }: Big5QuestionsProps) {
           >
             <div className="dq-window px-6 py-5">
               <p className="text-xl font-medium leading-relaxed text-[#e8e0d4]">
-                {currentQuestion.text}
+                {t(currentQuestion.textKey)}
               </p>
             </div>
           </motion.div>
@@ -151,7 +154,7 @@ export function Big5Questions({ onComplete }: Big5QuestionsProps) {
       {/* Options — RPGコマンドリスト */}
       <div className="px-6 pb-4">
         <div className="w-full max-w-lg mx-auto space-y-2">
-          {OPTIONS.map((option) => (
+          {OPTION_KEYS.map((option) => (
             <motion.button
               key={option.value}
               onClick={() => handleSelect(option.value)}
@@ -165,7 +168,7 @@ export function Big5Questions({ onComplete }: Big5QuestionsProps) {
               <span className={`text-sm ${selectedValue === option.value ? "rpg-cursor" : "text-[#6a5c3e]"}`}>
                 {selectedValue === option.value ? "▶" : "　"}
               </span>
-              <span className="text-sm">{option.label}</span>
+              <span className="text-sm">{t(option.labelKey)}</span>
             </motion.button>
           ))}
         </div>
@@ -180,7 +183,7 @@ export function Big5Questions({ onComplete }: Big5QuestionsProps) {
             className="flex items-center gap-2 px-4 py-2 text-sm text-[#9a9080] hover:text-[#f0c040] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
-            <span>もどる</span>
+            <span>{t("big5.back")}</span>
           </button>
 
           <button
@@ -190,7 +193,7 @@ export function Big5Questions({ onComplete }: Big5QuestionsProps) {
               !canProceed ? "opacity-30 cursor-not-allowed" : ""
             }`}
           >
-            <span>{isLastQuestion ? "かんりょう" : "つぎへ"}</span>
+            <span>{isLastQuestion ? t("big5.done") : t("big5.next")}</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>

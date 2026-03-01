@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { TypewriterText } from "../ui/TypewriterText";
+import { useLanguage } from "../../lib/i18n";
+import type { TranslationKey } from "../../lib/i18n";
 
 interface GeneratingStoryPagesProps {
   onComplete: () => void;
@@ -8,315 +10,372 @@ interface GeneratingStoryPagesProps {
 }
 
 /* ════════════════════════════════════════════
-   Page 1: 接続開始 — Gate + Silhouette
+   Page 1: サービス概要 — ロゴ + 3要素アイコン
    ════════════════════════════════════════════ */
 function Page1Art() {
+  const { t } = useLanguage();
   return (
-    <div className="relative w-full h-full flex items-center justify-center">
-      {/* Gate (portal) */}
+    <div className="relative w-full h-full flex flex-col items-center justify-center gap-6">
+      {/* ロゴ */}
       <motion.div
-        className="relative w-20 h-28 border-2 border-[#f0c040]/80 rounded-t-full flex items-end justify-center"
-        animate={{ borderColor: ["rgba(240,192,64,0.5)", "rgba(240,192,64,0.9)", "rgba(240,192,64,0.5)"] }}
+        className="text-2xl font-bold tracking-widest text-[#f0c040]"
+        style={{ fontFamily: "var(--font-pixel, monospace)" }}
+        animate={{ opacity: [0.7, 1, 0.7] }}
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
       >
-        {/* Gate inner glow */}
-        <div className="absolute inset-1 rounded-t-full bg-[#f0c040]/5" />
-        {/* Silhouette */}
-        <div className="relative mb-1">
-          {/* Head */}
-          <div className="w-4 h-4 bg-[#333] rounded-sm mx-auto" />
-          {/* Body */}
-          <div className="w-5 h-6 bg-[#333] rounded-sm mx-auto mt-[1px]" />
-          {/* Legs */}
-          <div className="flex gap-[2px] justify-center mt-[1px]">
-            <div className="w-2 h-3 bg-[#333] rounded-sm" />
-            <div className="w-2 h-3 bg-[#333] rounded-sm" />
-          </div>
-        </div>
+        OpenClone
       </motion.div>
 
-      {/* Distant stars */}
-      {[...Array(12)].map((_, i) => (
+      {/* 3要素: 声 + 性格 + 見た目 → AI分身 */}
+      <div className="flex items-center gap-3">
+        {[
+          { icon: "🎤", labelKey: "generating.art.voice" as TranslationKey },
+          { icon: "🧠", labelKey: "generating.art.personality" as TranslationKey },
+          { icon: "📷", labelKey: "generating.art.appearance" as TranslationKey },
+        ].map((item, i) => (
+          <motion.div
+            key={i}
+            className="flex flex-col items-center gap-1"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 + i * 0.4 }}
+          >
+            <div className="w-12 h-12 border border-[#6a5c3e] rounded-sm flex items-center justify-center bg-[#0e0e24]">
+              <span className="text-lg">{item.icon}</span>
+            </div>
+            <span className="text-[10px] text-[#9a9080]">{t(item.labelKey)}</span>
+          </motion.div>
+        ))}
+
         <motion.div
-          key={i}
-          className="absolute w-[2px] h-[2px] bg-white/40 rounded-full"
-          style={{
-            left: `${10 + (i * 37) % 80}%`,
-            top: `${8 + (i * 23) % 70}%`,
-          }}
-          animate={{ opacity: [0.2, 0.6, 0.2] }}
-          transition={{ duration: 2 + (i % 3), repeat: Infinity, delay: i * 0.3 }}
-        />
-      ))}
+          className="text-[#f0c040] text-lg mx-1"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2 }}
+        >
+          →
+        </motion.div>
+
+        <motion.div
+          className="flex flex-col items-center gap-1"
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 2.3, type: "spring" }}
+        >
+          <div className="w-12 h-12 border-2 border-[#f0c040] rounded-sm flex items-center justify-center bg-[#0e0e24]">
+            <span className="text-lg">🤖</span>
+          </div>
+          <span className="text-[10px] text-[#f0c040]">{t("generating.art.aiClone")}</span>
+        </motion.div>
+      </div>
     </div>
   );
 }
 
 /* ════════════════════════════════════════════
-   Page 2: 声紋同期 — Waveform + Particles
+   Page 2: プロフィール登録 — フォームUI
    ════════════════════════════════════════════ */
 function Page2Art() {
+  const { t } = useLanguage();
+  return (
+    <div className="relative w-full h-full flex items-center justify-center">
+      <motion.div
+        className="w-52 border border-[#6a5c3e] rounded-sm bg-[#0e0e24] p-4 space-y-3"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* タイトル */}
+        <div className="text-xs text-[#f0c040] text-center mb-2">{t("generating.art.profileReg")}</div>
+
+        {/* 名前フィールド */}
+        <div className="space-y-1">
+          <div className="text-[10px] text-[#9a9080]">{t("generating.art.name")}</div>
+          <motion.div
+            className="h-6 border border-[#6a5c3e] rounded-sm bg-[#08081a] px-2 flex items-center"
+            initial={{ opacity: 0.5 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <motion.span
+              className="text-[10px] text-[#e8e0d4]"
+              initial={{ width: 0 }}
+              animate={{ width: "auto" }}
+              transition={{ delay: 1, duration: 0.8 }}
+            >
+              {t("generating.art.sampleName")}
+            </motion.span>
+          </motion.div>
+        </div>
+
+        {/* 写真エリア */}
+        <div className="space-y-1">
+          <div className="text-[10px] text-[#9a9080]">{t("generating.art.facePhoto")}</div>
+          <motion.div
+            className="h-16 border border-dashed border-[#6a5c3e] rounded-sm flex items-center justify-center"
+            animate={{ borderColor: ["rgba(106,92,62,0.5)", "rgba(240,192,64,0.6)", "rgba(106,92,62,0.5)"] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <div className="text-center">
+              <div className="text-lg text-[#9a9080]">📷</div>
+              <div className="text-[8px] text-[#9a9080]">{t("generating.art.uploadPhoto")}</div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* ボタン */}
+        <motion.div
+          className="h-6 bg-[#f0c040]/20 border border-[#f0c040] rounded-sm flex items-center justify-center"
+          animate={{ opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <span className="text-[10px] text-[#f0c040]">{t("generating.art.nextArrow")}</span>
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════
+   Page 3: 声の収集 — マイク + 波形UI
+   ════════════════════════════════════════════ */
+function Page3Art() {
+  const { t } = useLanguage();
   const bars = useMemo(() =>
-    Array.from({ length: 24 }, (_, i) => ({
-      height: 4 + Math.sin(i * 0.6) * 12 + Math.random() * 8,
-      delay: i * 0.08,
+    Array.from({ length: 16 }, (_, i) => ({
+      height: 4 + Math.sin(i * 0.8) * 10 + Math.random() * 6,
+      delay: i * 0.1,
     })),
   []);
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      {/* Waveform */}
-      <div className="flex items-center gap-[3px] h-16">
-        {bars.map((bar, i) => (
+      <div className="w-52 border border-[#6a5c3e] rounded-sm bg-[#0e0e24] p-4 space-y-3">
+        {/* シーン表示 */}
+        <div className="text-xs text-[#f0c040] text-center">{t("generating.art.morningScene")}</div>
+        <div className="border border-[#6a5c3e] rounded-sm p-2 bg-[#08081a]">
+          <p className="text-[10px] text-[#e8e0d4] text-center leading-relaxed whitespace-pre-line">
+            {t("generating.art.morningScript")}
+          </p>
+        </div>
+
+        {/* 波形 */}
+        <div className="flex items-center justify-center gap-[2px] h-8">
+          {bars.map((bar, i) => (
+            <motion.div
+              key={i}
+              className="w-[2px] bg-[#f0c040]/70 rounded-full"
+              animate={{
+                height: [bar.height, bar.height * 0.3, bar.height * 1.2, bar.height],
+              }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: bar.delay, ease: "easeInOut" }}
+              style={{ height: bar.height }}
+            />
+          ))}
+        </div>
+
+        {/* マイクボタン */}
+        <div className="flex justify-center">
           <motion.div
-            key={i}
-            className="w-[3px] bg-[#f0c040]/70 rounded-full"
-            animate={{
-              height: [bar.height, bar.height * 0.3, bar.height * 1.2, bar.height],
-              opacity: [0.5, 0.9, 0.7, 0.5],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              delay: bar.delay,
-              ease: "easeInOut",
-            }}
-            style={{ height: bar.height }}
-          />
-        ))}
+            className="w-10 h-10 rounded-full border-2 border-[#ff4444] bg-[#ff4444]/20 flex items-center justify-center"
+            animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <span className="text-sm">🎙</span>
+          </motion.div>
+        </div>
+        <div className="text-[8px] text-[#ff4444] text-center">{t("generating.art.recordingStatus")}</div>
       </div>
-
-      {/* Scan line */}
-      <motion.div
-        className="absolute top-1/2 -translate-y-1/2 w-[2px] h-20 bg-[#f0c040]/40"
-        animate={{ left: ["10%", "90%", "10%"] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      {/* Particles around center */}
-      {[...Array(8)].map((_, i) => {
-        const angle = (i / 8) * Math.PI * 2;
-        const r = 50 + Math.random() * 20;
-        return (
-          <motion.div
-            key={i}
-            className="absolute w-[3px] h-[3px] bg-white/50 rounded-full"
-            style={{
-              left: `calc(50% + ${Math.cos(angle) * r}px)`,
-              top: `calc(50% + ${Math.sin(angle) * r}px)`,
-            }}
-            animate={{ opacity: [0.2, 0.8, 0.2], scale: [0.8, 1.2, 0.8] }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-          />
-        );
-      })}
     </div>
   );
 }
 
 /* ════════════════════════════════════════════
-   Page 3: 人格マップ — Grid + Nodes
-   ════════════════════════════════════════════ */
-function Page3Art() {
-  const nodes = useMemo(() => [
-    { x: 30, y: 25 }, { x: 70, y: 20 }, { x: 50, y: 45 },
-    { x: 20, y: 60 }, { x: 75, y: 55 }, { x: 45, y: 70 },
-    { x: 60, y: 35 }, { x: 35, y: 40 },
-  ], []);
-
-  const connections = useMemo(() => [
-    [0, 2], [1, 2], [2, 4], [3, 5], [2, 6], [6, 7], [0, 7], [4, 1], [3, 7], [5, 4],
-  ], []);
-
-  return (
-    <div className="relative w-full h-full">
-      {/* Grid lines */}
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {/* Grid */}
-        {[...Array(6)].map((_, i) => (
-          <g key={i}>
-            <line x1={i * 20} y1="0" x2={i * 20} y2="100" stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />
-            <line x1="0" y1={i * 20} x2="100" y2={i * 20} stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />
-          </g>
-        ))}
-
-        {/* Connections */}
-        {connections.map(([a, b], i) => (
-          <motion.line
-            key={`c-${i}`}
-            x1={nodes[a].x}
-            y1={nodes[a].y}
-            x2={nodes[b].x}
-            y2={nodes[b].y}
-            stroke="rgba(255,255,255,0.3)"
-            strokeWidth="0.5"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 + i * 0.3 }}
-          />
-        ))}
-      </svg>
-
-      {/* Nodes */}
-      {nodes.map((node, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-[6px] h-[6px] bg-white rounded-full"
-          style={{ left: `${node.x}%`, top: `${node.y}%`, transform: "translate(-50%, -50%)" }}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: i * 0.4 }}
-        />
-      ))}
-    </div>
-  );
-}
-
-/* ════════════════════════════════════════════
-   Page 4: アバター顔生成 — Face outline build
+   Page 4: 性格診断 — Big5テストUI
    ════════════════════════════════════════════ */
 function Page4Art() {
+  const { t } = useLanguage();
+  const [selected, setSelected] = useState(-1);
+
+  useEffect(() => {
+    let idx = 0;
+    const interval = setInterval(() => {
+      setSelected(idx % 5);
+      idx++;
+    }, 1200);
+    return () => clearInterval(interval);
+  }, []);
+
+  const optionKeys: TranslationKey[] = [
+    "generating.art.opt1",
+    "generating.art.opt2",
+    "generating.art.opt3",
+    "generating.art.opt4",
+    "generating.art.opt5",
+  ];
+
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      {/* 2-head body template (faded) */}
-      <div className="relative">
-        {/* Head outline */}
-        <motion.div
-          className="w-16 h-16 border-2 border-white/60 rounded-lg mx-auto relative"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.3 }}
-        >
-          {/* Left eye */}
-          <motion.div
-            className="absolute top-5 left-3 w-3 h-3 border border-white/70 rounded-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 1.2 }}
-          />
-          {/* Right eye */}
-          <motion.div
-            className="absolute top-5 right-3 w-3 h-3 border border-white/70 rounded-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 1.6 }}
-          />
-          {/* Mouth */}
-          <motion.div
-            className="absolute bottom-3 left-1/2 -translate-x-1/2 w-5 h-[2px] bg-white/60 rounded"
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ duration: 0.5, delay: 2.0 }}
-          />
-        </motion.div>
+      <div className="w-52 border border-[#6a5c3e] rounded-sm bg-[#0e0e24] p-4 space-y-3">
+        <div className="text-xs text-[#f0c040] text-center">{t("generating.art.big5Title")}</div>
 
-        {/* Body (template, dimmed) */}
-        <motion.div
-          className="w-12 h-16 border-2 border-white/20 rounded-lg mx-auto mt-1"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.4 }}
-          transition={{ duration: 1, delay: 0.5 }}
-        >
-          {/* Arms */}
-          <div className="absolute -left-2 top-[72px] w-4 h-8 border border-white/15 rounded-lg" />
-          <div className="absolute -right-2 top-[72px] w-4 h-8 border border-white/15 rounded-lg" />
-        </motion.div>
+        {/* 質問 */}
+        <div className="border border-[#6a5c3e] rounded-sm p-2 bg-[#08081a]">
+          <p className="text-[10px] text-[#e8e0d4] text-center">
+            {t("generating.art.big5Question")}
+          </p>
+        </div>
 
-        {/* Scan effect over face */}
-        <motion.div
-          className="absolute top-0 left-0 right-0 h-[2px] bg-white/30"
-          animate={{ top: ["0px", "64px", "0px"] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        />
+        {/* 選択肢 */}
+        <div className="space-y-1">
+          {optionKeys.map((key, i) => (
+            <motion.div
+              key={i}
+              className={`h-5 border rounded-sm flex items-center justify-center text-[9px] transition-colors ${
+                selected === i
+                  ? "border-[#f0c040] bg-[#f0c040]/20 text-[#f0c040]"
+                  : "border-[#6a5c3e]/50 text-[#9a9080]"
+              }`}
+              animate={selected === i ? { scale: [1, 1.02, 1] } : {}}
+              transition={{ duration: 0.3 }}
+            >
+              {t(key)}
+            </motion.div>
+          ))}
+        </div>
+
+        {/* プログレス */}
+        <div className="h-1.5 bg-[#1a1a2e] rounded-full overflow-hidden">
+          <motion.div
+            className="h-full bg-[#f0c040]/60 rounded-full"
+            animate={{ width: ["20%", "30%", "40%", "30%"] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          />
+        </div>
       </div>
     </div>
   );
 }
 
 /* ════════════════════════════════════════════
-   Page 5: 最終リンク — Bright gate + outlined avatar
+   Page 5: AI分身の生成 — 統合アニメーション
    ════════════════════════════════════════════ */
 function Page5Art() {
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      {/* Large bright gate */}
-      <motion.div
-        className="relative w-28 h-40 border-2 border-[#f0c040] rounded-t-full flex items-end justify-center overflow-hidden"
-        animate={{ borderColor: ["rgba(240,192,64,0.7)", "rgba(240,192,64,1)", "rgba(240,192,64,0.7)"] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-      >
-        {/* Inner glow */}
-        <motion.div
-          className="absolute inset-0 rounded-t-full bg-[#f0c040]/10"
-          animate={{ opacity: [0.05, 0.15, 0.05] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        />
+      <div className="flex flex-col items-center gap-4">
+        {/* 3要素が中央に集まる */}
+        <div className="relative w-40 h-28">
+          {[
+            { icon: "🎤", x: -40, y: -20, delay: 0 },
+            { icon: "🧠", x: 40, y: -20, delay: 0.3 },
+            { icon: "📷", x: 0, y: 30, delay: 0.6 },
+          ].map((item, i) => (
+            <motion.div
+              key={i}
+              className="absolute left-1/2 top-1/2 w-8 h-8 border border-[#6a5c3e] rounded-sm flex items-center justify-center bg-[#0e0e24]"
+              initial={{ x: item.x, y: item.y, opacity: 0.5 }}
+              animate={{
+                x: [item.x, 0],
+                y: [item.y, 0],
+                opacity: [0.5, 1, 0],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                delay: item.delay,
+                ease: "easeInOut",
+              }}
+              style={{ marginLeft: -16, marginTop: -16 }}
+            >
+              <span className="text-sm">{item.icon}</span>
+            </motion.div>
+          ))}
 
-        {/* Avatar silhouette with gold edge */}
-        <div className="relative mb-2">
-          {/* Head */}
-          <div className="w-5 h-5 bg-[#0e0e24] border border-[#f0c040]/70 rounded-sm mx-auto" />
-          {/* Body */}
-          <div className="w-6 h-8 bg-[#0e0e24] border border-[#f0c040]/70 rounded-sm mx-auto mt-[1px]" />
-          {/* Legs */}
-          <div className="flex gap-[2px] justify-center mt-[1px]">
-            <div className="w-2.5 h-4 bg-[#0e0e24] border border-[#f0c040]/70 rounded-sm" />
-            <div className="w-2.5 h-4 bg-[#0e0e24] border border-[#f0c040]/70 rounded-sm" />
-          </div>
+          {/* 中央のアバター */}
+          <motion.div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            animate={{ opacity: [0, 0, 1, 1, 0], scale: [0.5, 0.5, 1, 1, 0.5] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div className="w-10 h-10 border-2 border-[#f0c040] rounded-sm flex items-center justify-center bg-[#0e0e24]">
+              <span className="text-xl">🤖</span>
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
 
-      {/* Screen brightness overlay */}
-      <motion.div
-        className="absolute inset-0 bg-white/0 pointer-events-none"
-        animate={{ backgroundColor: ["rgba(255,255,255,0)", "rgba(255,255,255,0.04)", "rgba(255,255,255,0)"] }}
-        transition={{ duration: 3, repeat: Infinity }}
-      />
+        {/* 処理中のドット */}
+        <div className="flex gap-1">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="w-2 h-2 bg-[#f0c040] rounded-full"
+              animate={{ opacity: [0.2, 1, 0.2] }}
+              transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.3 }}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
 
 /* ════════════════════════════════════════════
-   Page 6: READY — Idle standing avatar + stable gate
+   Page 6: 会話スタート — チャットUI
    ════════════════════════════════════════════ */
 function Page6Art() {
-  const [breathFrame, setBreathFrame] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => setBreathFrame((p) => (p + 1) % 2), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
+  const { t } = useLanguage();
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      {/* Stable gate glow */}
-      <div className="absolute w-32 h-32 rounded-full bg-white/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-      <motion.div
-        className="absolute w-24 h-24 rounded-full bg-white/8 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-        animate={{ opacity: [0.06, 0.12, 0.06] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-      />
+      <div className="w-52 border border-[#6a5c3e] rounded-sm bg-[#0e0e24] overflow-hidden">
+        {/* ヘッダー */}
+        <div className="px-3 py-1.5 border-b border-[#6a5c3e] flex items-center justify-between">
+          <span className="text-[8px] text-[#f0c040]">AGENT WORLD</span>
+          <span className="text-[8px] text-[#9a9080]">💬</span>
+        </div>
 
-      {/* Standing 2-head avatar (slightly transparent) */}
-      <motion.div
-        className="relative opacity-60"
-        animate={{ y: breathFrame === 0 ? 0 : -1 }}
-        transition={{ duration: 1, ease: "easeInOut" }}
-      >
-        {/* Head */}
-        <div className="w-8 h-8 bg-gradient-to-b from-[#ffd4a3]/60 to-[#ffb366]/60 rounded-sm mx-auto border border-white/30">
-          <div className="absolute top-2.5 left-1.5 w-[3px] h-[3px] bg-black/60 rounded-full" />
-          <div className="absolute top-2.5 right-1.5 w-[3px] h-[3px] bg-black/60 rounded-full" />
-          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-2 h-[1px] bg-black/40" />
+        {/* アバター */}
+        <div className="flex justify-center py-3">
+          <motion.div
+            className="relative"
+            animate={{ y: [0, -2, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div className="w-8 h-8 border border-[#f0c040]/50 rounded-sm bg-[#08081a] flex items-center justify-center">
+              <span className="text-sm">🧑</span>
+            </div>
+          </motion.div>
         </div>
-        {/* Body */}
-        <div className="w-7 h-10 bg-[#4a90e2]/40 rounded-sm mx-auto mt-[1px] border border-white/20" />
-        {/* Legs */}
-        <div className="flex gap-[2px] justify-center mt-[1px]">
-          <div className="w-3 h-4 bg-[#2e5c8a]/40 rounded-sm border border-white/15" />
-          <div className="w-3 h-4 bg-[#2e5c8a]/40 rounded-sm border border-white/15" />
+
+        {/* 吹き出し */}
+        <div className="mx-2 mb-2 border border-[#6a5c3e] rounded-sm p-2 bg-[#08081a]">
+          <motion.p
+            className="text-[9px] text-[#e8e0d4] leading-relaxed whitespace-pre-line"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            {t("generating.art.chatGreeting")}
+          </motion.p>
         </div>
-      </motion.div>
+
+        {/* 入力エリア */}
+        <div className="px-2 pb-2 flex items-center gap-1">
+          <div className="flex-1 h-5 border border-[#6a5c3e] rounded-sm bg-[#08081a] px-1.5 flex items-center">
+            <span className="text-[8px] text-[#9a9080]">{t("generating.art.chatPlaceholder")}</span>
+          </div>
+          <motion.div
+            className="w-5 h-5 bg-[#f0c040]/20 border border-[#f0c040] rounded-sm flex items-center justify-center"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <span className="text-[8px]">▶</span>
+          </motion.div>
+          <div className="w-5 h-5 border border-[#6a5c3e] rounded-sm flex items-center justify-center">
+            <span className="text-[8px]">🎤</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -324,43 +383,20 @@ function Page6Art() {
 /* ════════════════════════════════════════════
    Story Pages Data
    ════════════════════════════════════════════ */
-const STORY_PAGES = [
-  {
-    line1: "AGENT WORLD 接続中...",
-    line2: "君のクローン生成を開始した",
-    Art: Page1Art,
-  },
-  {
-    line1: "VOICE SYNC 進行中",
-    line2: "声の粒をコアに編み込んでいる",
-    Art: Page2Art,
-  },
-  {
-    line1: "PERSONA MAP 構築中",
-    line2: "言葉の癖と判断軸を固定している",
-    Art: Page3Art,
-  },
-  {
-    line1: "AVATAR FACE COMPILE",
-    line2: "君の面影を2等身ボディへ接続",
-    Art: Page4Art,
-  },
-  {
-    line1: "FINAL LINK...",
-    line2: "起動まで、あと少し",
-    Art: Page5Art,
-  },
-  {
-    line1: "READY",
-    line2: "生成完了で進行ボタンが表示される",
-    Art: Page6Art,
-  },
+const STORY_PAGES: { line1Key: TranslationKey; line2Key: TranslationKey; Art: React.FC }[] = [
+  { line1Key: "generating.page1.line1", line2Key: "generating.page1.line2", Art: Page1Art },
+  { line1Key: "generating.page2.line1", line2Key: "generating.page2.line2", Art: Page2Art },
+  { line1Key: "generating.page3.line1", line2Key: "generating.page3.line2", Art: Page3Art },
+  { line1Key: "generating.page4.line1", line2Key: "generating.page4.line2", Art: Page4Art },
+  { line1Key: "generating.page5.line1", line2Key: "generating.page5.line2", Art: Page5Art },
+  { line1Key: "generating.page6.line1", line2Key: "generating.page6.line2", Art: Page6Art },
 ];
 
 /* ════════════════════════════════════════════
    Main Component
    ════════════════════════════════════════════ */
 export function GeneratingStoryPages({ onComplete, onSkip }: GeneratingStoryPagesProps) {
+  const { t, lang } = useLanguage();
   const [pageIndex, setPageIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [canSkip, setCanSkip] = useState(false);
@@ -400,7 +436,7 @@ export function GeneratingStoryPages({ onComplete, onSkip }: GeneratingStoryPage
   const currentPage = STORY_PAGES[pageIndex];
 
   return (
-    <div className="absolute inset-0 bg-[#08081a] flex flex-col z-20">
+    <div className="absolute inset-0 bg-black flex flex-col z-20">
       {/* ─── Pixel Art Scene (takes up main space) ─── */}
       <div className="flex-1 relative overflow-hidden">
         <AnimatePresence mode="wait">
@@ -431,10 +467,10 @@ export function GeneratingStoryPages({ onComplete, onSkip }: GeneratingStoryPage
               transition={{ duration: 0.5 }}
             >
               <p className="text-[#f0c040] text-sm tracking-wider font-pixel-accent">
-                <TypewriterText key={`l1-${pageIndex}`} text={currentPage.line1} speed={40} delay={300} />
+                <TypewriterText key={`l1-${pageIndex}-${lang}`} text={t(currentPage.line1Key)} speed={40} delay={300} />
               </p>
               <p className="text-[#e8e0d4] text-sm">
-                <TypewriterText key={`l2-${pageIndex}`} text={currentPage.line2} speed={35} delay={1200} />
+                <TypewriterText key={`l2-${pageIndex}-${lang}`} text={t(currentPage.line2Key)} speed={35} delay={1200} />
               </p>
             </motion.div>
           </AnimatePresence>
@@ -450,7 +486,7 @@ export function GeneratingStoryPages({ onComplete, onSkip }: GeneratingStoryPage
             />
           </div>
           <div className="flex justify-between text-xs text-[#9a9080]">
-            <span>生成中</span>
+            <span>{t("generating.progress")}</span>
             <span>{Math.round(progress)}%</span>
           </div>
         </div>
@@ -462,7 +498,7 @@ export function GeneratingStoryPages({ onComplete, onSkip }: GeneratingStoryPage
               onClick={onComplete}
               className="rpg-btn-primary w-full py-3 text-sm font-medium"
             >
-              ▶ せかいにいく
+              {t("generating.go")}
             </button>
           </motion.div>
         ) : canSkip ? (
@@ -471,7 +507,7 @@ export function GeneratingStoryPages({ onComplete, onSkip }: GeneratingStoryPage
               onClick={onSkip}
               className="rpg-btn w-full py-3 text-sm text-[#9a9080] hover:text-[#f0c040]"
             >
-              先にはじめる
+              {t("generating.skip")}
             </button>
           </motion.div>
         ) : null}

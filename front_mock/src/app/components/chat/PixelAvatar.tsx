@@ -90,7 +90,7 @@ export function PixelAvatar({ action = "idle", assetUrls }: PixelAvatarProps) {
   // アセット未取得時はローディング表示
   if (!assetUrls) {
     return (
-      <div className="w-48 h-72 flex items-center justify-center">
+      <div className="w-[36rem] h-[54rem] max-w-full max-h-[60vh] flex items-center justify-center">
         <div className="w-16 h-16 border-2 border-[#6a5c3e] rounded animate-pulse bg-[#0e0e24]" />
       </div>
     );
@@ -104,7 +104,7 @@ export function PixelAvatar({ action = "idle", assetUrls }: PixelAvatarProps) {
         <img
           src={currentFrameUrl}
           alt={`${motionName} frame ${frameIndex}`}
-          className="w-48 h-72 object-contain image-rendering-pixelated"
+          className="w-[36rem] h-[54rem] max-w-full max-h-[60vh] object-contain image-rendering-pixelated"
           draggable={false}
         />
       </div>
@@ -118,7 +118,7 @@ export function PixelAvatar({ action = "idle", assetUrls }: PixelAvatarProps) {
         <img
           src={gifUrl}
           alt={motionName}
-          className="w-48 h-72 object-contain image-rendering-pixelated"
+          className="w-[36rem] h-[54rem] max-w-full max-h-[60vh] object-contain image-rendering-pixelated"
           draggable={false}
         />
       </div>
@@ -132,7 +132,7 @@ export function PixelAvatar({ action = "idle", assetUrls }: PixelAvatarProps) {
         <img
           src={assetUrls.base_fullbody_png}
           alt="avatar base"
-          className="w-48 h-72 object-contain image-rendering-pixelated"
+          className="w-[36rem] h-[54rem] max-w-full max-h-[60vh] object-contain image-rendering-pixelated"
           draggable={false}
         />
       </div>
@@ -141,7 +141,7 @@ export function PixelAvatar({ action = "idle", assetUrls }: PixelAvatarProps) {
 
   // 完全にアセットがない場合のフォールバック
   return (
-    <div className="w-48 h-72 flex items-center justify-center text-[#9a9080] text-xs">
+    <div className="w-[36rem] h-[54rem] max-w-full max-h-[60vh] flex items-center justify-center text-[#9a9080] text-xs">
       アバター準備中
     </div>
   );

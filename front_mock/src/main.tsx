@@ -5,6 +5,7 @@ import App from './app/App'
 import './styles/index.css'
 import { Toaster } from 'sonner'
 import { env } from './app/lib/utils/env'
+import { LanguageProvider } from './app/lib/i18n'
 
 // Register Service Worker for PWA
 // 一時的に無効化（キャッシュ問題のため）
@@ -40,8 +41,10 @@ function AppShell() {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <div className="crt-scanlines crt-vignette">
-      <AppShell />
-    </div>
+    <LanguageProvider>
+      <div className="crt-scanlines crt-vignette">
+        <AppShell />
+      </div>
+    </LanguageProvider>
   </StrictMode>,
 )

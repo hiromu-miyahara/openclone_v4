@@ -6,15 +6,22 @@ import { TypewriterText } from "../ui/TypewriterText";
 import { api } from "../../lib/api";
 import { setToken } from "../../lib/api/client";
 import { env } from "../../lib/utils/env";
+import { isApiMock } from "../../lib/utils/env";
+import { useLanguage } from "../../lib/i18n";
 
 const hasGoogleClientId = !!env.VITE_GOOGLE_CLIENT_ID;
 
 function useAuth() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const sendTokenToBackend = useCallback(async (accessToken: string) => {
+    if (isApiMock()) {
+      navigate("/onboarding");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -22,11 +29,11 @@ function useAuth() {
       setToken(result.token);
       navigate("/onboarding");
     } catch {
-      setError("ログインに失敗しました。もう一度お試しください。");
+      setError(t("landing.loginError"));
     } finally {
       setLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, t]);
 
   return { loading, error, setError, sendTokenToBackend };
 }
@@ -37,13 +44,14 @@ function GoogleLoginButton({ loading, onError, onToken }: {
   onError: (msg: string) => void;
   onToken: (token: string) => void;
 }) {
+  const { t } = useLanguage();
   const googleLogin = useGoogleLogin({
     flow: "implicit",
     onSuccess: (tokenResponse) => {
       onToken(tokenResponse.access_token);
     },
     onError: () => {
-      onError("Googleログインがキャンセルされました。");
+      onError(t("landing.loginCancelled"));
     },
   });
 
@@ -67,6 +75,7 @@ function FallbackLoginButton({ loading, onClick }: {
 }
 
 function RPGLoginButton({ loading, onClick }: { loading: boolean; onClick: () => void }) {
+  const { t } = useLanguage();
   return (
     <button
       onClick={onClick}
@@ -74,7 +83,7 @@ function RPGLoginButton({ loading, onClick }: { loading: boolean; onClick: () =>
       className="rpg-btn-primary w-full px-6 py-3 flex items-center justify-center gap-3 disabled:opacity-40"
     >
       <span className="rpg-cursor text-sm">▶</span>
-      <span>{loading ? "ログイン中..." : "はじめる"}</span>
+      <span>{loading ? t("landing.loggingIn") : t("landing.start")}</span>
     </button>
   );
 }
@@ -120,12 +129,37 @@ function StarField() {
 
 export function LandingPage() {
   const { loading, error, setError, sendTokenToBackend } = useAuth();
+  const { lang, setLang, t } = useLanguage();
   const [taglineDone, setTaglineDone] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#08081a] text-[#e8e0d4] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-black text-[#e8e0d4] flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* 星空背景 */}
       <StarField />
+
+      {/* ─── Language Toggle (top-right) ─── */}
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-1">
+        <button
+          onClick={() => setLang("ja")}
+          className={`px-3 py-1.5 text-xs rounded-sm transition-colors ${
+            lang === "ja"
+              ? "bg-[#f0c040] text-black font-bold"
+              : "bg-[#1a1a3a] text-[#9a9080] hover:text-[#e8e0d4] border border-[#6a5c3e]"
+          }`}
+        >
+          JP
+        </button>
+        <button
+          onClick={() => setLang("en")}
+          className={`px-3 py-1.5 text-xs rounded-sm transition-colors ${
+            lang === "en"
+              ? "bg-[#f0c040] text-black font-bold"
+              : "bg-[#1a1a3a] text-[#9a9080] hover:text-[#e8e0d4] border border-[#6a5c3e]"
+          }`}
+        >
+          EN
+        </button>
+      </div>
 
       {/* 中央のぼんやりした光 */}
       <motion.div
@@ -167,7 +201,8 @@ export function LandingPage() {
           <div className="dq-window px-5 py-4">
             <p className="text-[#9a9080] text-sm leading-relaxed">
               <TypewriterText
-                text="あなたの分身を、この世界に。"
+                key={`tagline-${lang}`}
+                text={t("landing.tagline")}
                 speed={60}
                 delay={1400}
                 onComplete={() => setTaglineDone(true)}
@@ -213,7 +248,7 @@ export function LandingPage() {
             )}
 
             <p className="text-xs text-[#9a9080] mt-4">
-              ログインすることで、あなた専用のAIクローン環境が自動的に構築されます。
+              {t("landing.description")}
             </p>
           </motion.div>
         )}
