@@ -1,0 +1,14 @@
+/* OpenClone Fonts — Retro RPG */
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap');
+
+/* Primary: pixel-style Japanese font */
+body,
+h1, h2, h3, h4, h5, h6,
+p, span, label, button, input, textarea, select, a {
+  font-family: 'DotGothic16', monospace;
+}
+
+/* Accent: 8-bit English pixel font (use with .font-pixel-accent) */
+.font-pixel-accent {
+  font-family: 'Press Start 2P', monospace;
+}

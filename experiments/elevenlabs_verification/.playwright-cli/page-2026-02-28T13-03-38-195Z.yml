@@ -1,0 +1,58 @@
+- generic [ref=e5]:
+  - main [ref=e6]:
+    - generic [ref=e7]:
+      - heading "🎙️ ElevenLabs Voice Cloning Lab" [level=1] [ref=e12]
+      - paragraph [ref=e17]: 音声を録音して、自分の声を再現するボイスクローンを作成・テストできます
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - generic [ref=e20]:
+            - button [ref=e21] [cursor=pointer]: 🎙️ 録音
+            - button [ref=e22] [cursor=pointer]: 🎭 ボイスクローン作成
+            - button [ref=e23] [cursor=pointer]: 🔊 音声生成テスト
+            - button [ref=e24] [cursor=pointer]: 📋 ボイス管理
+          - tablist [ref=e25]:
+            - tab "🎙️ 録音" [selected] [ref=e26] [cursor=pointer]
+            - tab "🎭 ボイスクローン作成" [ref=e27] [cursor=pointer]
+            - tab "🔊 音声生成テスト" [ref=e28] [cursor=pointer]
+            - tab "📋 ボイス管理" [ref=e29] [cursor=pointer]
+        - tabpanel [ref=e30]:
+          - generic [ref=e31]:
+            - 'heading "ステップ1: 音声を録音してください" [level=3] [ref=e36]'
+            - paragraph [ref=e41]: ※ 30秒以上の音声を複数回録音すると、より良い結果が得られます
+            - generic [ref=e43]:
+              - generic:
+                - generic:
+                  - img
+                - text: マイクで録音
+              - generic [ref=e44]:
+                - button "クリア" [ref=e46] [cursor=pointer]:
+                  - img [ref=e48]
+                - generic [ref=e53]:
+                  - button "録音" [ref=e55] [cursor=pointer]
+                  - combobox "Select input device" [disabled] [ref=e56]:
+                    - option "マイクが見つかりません" [selected]
+            - button "📝 録音を追加" [ref=e58] [cursor=pointer]
+            - generic [ref=e61]:
+              - generic [ref=e62]: 録音ステータス
+              - textbox "録音ステータス" [disabled] [ref=e64]:
+                - /placeholder: ""
+            - heading "録音済みファイル" [level=3] [ref=e69]
+            - generic [ref=e72]:
+              - generic [ref=e73]: 録音リスト
+              - textbox "録音リスト" [disabled] [ref=e75]:
+                - /placeholder: ""
+                - text: まだ録音されていません
+            - button "🗑️ クリア" [ref=e77] [cursor=pointer]
+  - contentinfo "Gradio footer navigation" [ref=e78]:
+    - button "APIを介して使用 ロゴ" [ref=e79] [cursor=pointer]:
+      - text: APIを介して使用
+      - img "ロゴ" [ref=e80]
+    - generic [ref=e81]: ·
+    - link "Gradioで作成 ロゴ" [ref=e82] [cursor=pointer]:
+      - /url: https://gradio.app
+      - text: Gradioで作成
+      - img "ロゴ" [ref=e83]
+    - generic [ref=e84]: ·
+    - button "設定 設定" [ref=e85] [cursor=pointer]:
+      - text: 設定
+      - img "設定" [ref=e86]

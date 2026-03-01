@@ -1,0 +1,19 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: OpenClone (API)
+      - button "履歴" [ref=e6]:
+        - img [ref=e7]
+        - generic [ref=e9]: 履歴
+    - generic [ref=e25]:
+      - paragraph [ref=e28]:
+        - generic [ref=e29]: こんにちは！あなたの分身です。
+        - text: 何でも話しかけてください。
+      - img [ref=e31]
+    - generic [ref=e34]:
+      - button [ref=e35]:
+        - img [ref=e36]
+      - textbox "メッセージを入力..." [ref=e39]
+      - button [disabled] [ref=e40]:
+        - img [ref=e41]
+  - region "Notifications alt+T"

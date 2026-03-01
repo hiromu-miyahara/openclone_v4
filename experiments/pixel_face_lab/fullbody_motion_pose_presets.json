@@ -1,0 +1,105 @@
+{
+  "idle": [
+    "neutral standing, relaxed arms",
+    "tiny breathing in, shoulders slightly up",
+    "neutral standing",
+    "tiny breathing out, shoulders slightly down",
+    "neutral standing with small blink",
+    "neutral standing"
+  ],
+  "speaking": [
+    "mouth closed, neutral",
+    "mouth half open, slight hand emphasis",
+    "mouth open, slight hand emphasis",
+    "mouth half open, subtle bounce",
+    "mouth closed, tiny smile",
+    "mouth tiny open, neutral eyes"
+  ],
+  "nod": [
+    "head neutral, body upright",
+    "head slightly down",
+    "head down",
+    "head slightly up",
+    "head neutral",
+    "head neutral with blink"
+  ],
+  "agree": [
+    "neutral standing",
+    "right hand raises to chest height",
+    "right hand raised high, positive expression",
+    "right hand lowers to chest height",
+    "right hand back to neutral",
+    "neutral with gentle smile"
+  ],
+  "surprised": [
+    "normal eyes, mouth closed",
+    "eyes wider, mouth tiny open",
+    "eyes widest, mouth open",
+    "eyes wide, mouth half open",
+    "recovering expression",
+    "normal eyes, mouth closed"
+  ],
+  "thinking": [
+    "thinking pose, hand on chin, eyes up-left, slight frown",
+    "takes out small memo pad, glancing down to confirm notes",
+    "checks memo carefully, pen near lips, focused expression",
+    "returns to thinking pose with tiny nod as if idea clicked"
+  ],
+  "joy": [
+    "big happy smile, both arms lifted to shoulder height, energetic stance",
+    "maximum joy, both arms raised high, eyes joyful, mouth open smile, slight upward bounce",
+    "happy settle pose, one fist pump near chest, bright smile"
+  ],
+  "futon_sleep": [
+    "sleepy yawn, one hand near mouth, heavy eyelids",
+    "bending down to get into futon, knees slightly bent, torso forward",
+    "inside futon up to shoulders, eyes closed, peaceful face",
+    "inside futon sleeping, visible zzz text near head, calm breathing"
+  ],
+  "futon_out": [
+    "inside futon sleeping, eyes closed, tiny zzz near head",
+    "waking up in futon, eyes half open, zzz disappearing",
+    "pushing blanket down, upper body rising",
+    "getting out of futon, bent forward with one knee out",
+    "standing beside futon, sleepy stretch with a small yawn"
+  ],
+  "anger": [
+    "annoyed face, brows down, fists clenched",
+    "angry stance, one foot forward, fists tight, mouth open shout",
+    "maximum anger, both fists up, strong frown, tense body",
+    "anger settle, one fist near chest, stern face"
+  ],
+  "melancholy": [
+    "sad neutral, shoulders dropped, eyes down",
+    "deeper sadness, head down, small sigh posture",
+    "melancholy pause, hand near chest, distant eyes",
+    "quiet recovery, soft sad expression"
+  ],
+  "fun": [
+    "playful smile, light stance",
+    "cheerful wave with one hand",
+    "small hop with both arms open, bright smile",
+    "playful pose, one hand on hip, grin"
+  ],
+  "surprise": [
+    "normal face, relaxed posture",
+    "eyes wide, mouth open, slight lean back",
+    "peak surprise, both hands up near shoulders",
+    "recovering surprise, eyes still wide"
+  ],
+  "study_note": [
+    "ready to study, holding notebook and pen",
+    "writing memo, focused eyes downward",
+    "writing faster, slight nod, concentrated face",
+    "checking notes, pen paused near chin",
+    "writing final line, satisfied tiny smile"
+  ],
+  "walk_wander": [
+    "step right, light forward walk, looking around",
+    "neutral passing step, arms swing naturally",
+    "step left, head turns slightly other side",
+    "neutral passing step, curious expression",
+    "small pause, looking around",
+    "resume step right, wandering vibe"
+  ]
+}

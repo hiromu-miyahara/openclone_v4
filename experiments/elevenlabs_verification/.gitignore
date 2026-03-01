@@ -1,0 +1,24 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Audio files (except samples)
+results/*.mp3
+results/*.wav
+results/*.m4a
+voice_profiles/*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.npm/
+
+# Build / output
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.DS_Store
+*.log
+.cache/
+
+# Front (Vite / Playwright)
+front_mock/test-results/
+front_mock/playwright-report/
+front_mock/blob-report/
+front_mock/.playwright/
+
+# Backend
+backend/dist/
+
+# Experiments
+.venv/
+__pycache__/
+*.pyc
+experiments/*/output/*
+!experiments/*/output/.gitkeep
+
+# Optional: uncomment if you don't want to track
+# .cursor/
+# .vscode/

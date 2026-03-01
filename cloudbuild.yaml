@@ -1,0 +1,20 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - backend/Dockerfile
+      - -t
+      - asia-northeast1-docker.pkg.dev/${PROJECT_ID}/openclone/openclone-backend:${COMMIT_SHA}
+      - .
+    id: build
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - asia-northeast1-docker.pkg.dev/${PROJECT_ID}/openclone/openclone-backend:${COMMIT_SHA}
+    id: push
+    waitFor:
+      - build
+
+images:
+  - asia-northeast1-docker.pkg.dev/${PROJECT_ID}/openclone/openclone-backend:${COMMIT_SHA}

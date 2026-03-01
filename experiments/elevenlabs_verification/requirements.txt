@@ -1,0 +1,14 @@
+# ElevenLabs SDK
+elevenlabs>=1.0.0
+
+# Audio processing
+pydub>=0.25.1
+ffmpeg-python>=0.2.0
+
+# Utility
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+
+# For audio visualization (optional)
+matplotlib>=3.7.0
+numpy>=1.24.0

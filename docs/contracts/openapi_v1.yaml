@@ -1,0 +1,877 @@
+openapi: 3.1.0
+info:
+  title: OpenClone API Contract v1
+  version: 1.3.0
+  description: |
+    OpenClone MVPのフロント/バックエンド並列開発用のAPI契約。
+    本仕様をDay 0で凍結し、破壊的変更は行わない。
+    state-changing API（POST/DELETE）は `Origin` 検証を必須とする。
+servers:
+  - url: https://api.openclone.example.com
+    description: production
+  - url: http://localhost:8080
+    description: local
+tags:
+  - name: auth
+  - name: onboarding
+  - name: chat
+  - name: stt
+  - name: data
+security:
+  - BearerAuth: []
+paths:
+  /api/auth/login:
+    post:
+      tags: [auth]
+      summary: ログイン
+      description: |
+        発行トークン（Bearer JWT）の有効期限は24時間。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [login_token]
+              properties:
+                login_token:
+                  type: string
+                  minLength: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthLoginResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/auth/logout:
+    post:
+      tags: [auth]
+      summary: ログアウト
+      responses:
+        "204":
+          description: No Content
+
+  /api/auth/me:
+    get:
+      tags: [auth]
+      summary: 自分のユーザー情報
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [user]
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/onboarding/start:
+    post:
+      tags: [onboarding]
+      summary: オンボーディング開始
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [onboarding_session_id]
+                properties:
+                  onboarding_session_id:
+                    type: string
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/onboarding/answers:
+    post:
+      tags: [onboarding]
+      summary: オンボーディング回答保存
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OnboardingAnswerRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [saved]
+                properties:
+                  saved:
+                    type: boolean
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/onboarding/big5-answers:
+    post:
+      tags: [onboarding]
+      summary: Big5回答保存
+      description: |
+        TIPI-J 10項目に対する7件法（1..7）の回答を保存する。
+        逆転処理はサーバー側で実施する。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Big5AnswerRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [saved]
+                properties:
+                  saved:
+                    type: boolean
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/onboarding/big5-result:
+    get:
+      tags: [onboarding]
+      summary: Big5結果取得
+      parameters:
+        - in: query
+          name: onboarding_session_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Big5ResultResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/onboarding/answer-audio-upload:
+    post:
+      tags: [onboarding]
+      summary: オンボーディング回答音声アップロード
+      description: |
+        受け付ける音声形式は `audio/mpeg`, `audio/wav`, `audio/webm`, `audio/ogg`。
+        最大サイズは10MB。
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [audio]
+              properties:
+                audio:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [answer_audio_url]
+                properties:
+                  answer_audio_url:
+                    type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/onboarding/photo-upload:
+    post:
+      tags: [onboarding]
+      summary: 顔写真アップロード（Nanobanana2ジョブ起動）
+      description: |
+        受け付ける画像形式は `image/jpeg`, `image/png`。
+        最大サイズは5MB。
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [photo]
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhotoUploadResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/onboarding/pixelart-status/{job_id}:
+    get:
+      tags: [onboarding]
+      summary: ドット絵生成ジョブ状態取得（Nanobanana2パイプライン）
+      parameters:
+        - in: path
+          name: job_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PixelartJobStatusResponse"
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/onboarding/complete:
+    post:
+      tags: [onboarding]
+      summary: オンボーディング完了
+      description: |
+        完了条件は「音声8問 + Big5 10問」が保存済みであり、
+        Voice Clone作成状態が `ready` であること。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [onboarding_session_id]
+              properties:
+                onboarding_session_id:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [persona_profile_id]
+                properties:
+                  persona_profile_id:
+                    type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/onboarding/voice-clone/start:
+    post:
+      tags: [onboarding]
+      summary: Voice Clone作成ジョブ開始
+      description: |
+        オンボーディング音声8問をすべて連結して Voice Clone を作成する。
+        品質フィルタリングは行わない。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VoiceCloneStartRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VoiceCloneStartResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/onboarding/voice-clone-status/{job_id}:
+    get:
+      tags: [onboarding]
+      summary: Voice Clone作成ジョブ状態取得
+      parameters:
+        - in: path
+          name: job_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VoiceCloneStatusResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/runtime/status:
+    get:
+      tags: [onboarding]
+      summary: ユーザー専用OpenClawランタイム状態取得
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RuntimeStatusResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/stt/transcribe:
+    post:
+      tags: [stt]
+      summary: 音声をテキスト化（Voxtral）
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [audio]
+              properties:
+                audio:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [transcript]
+                properties:
+                  transcript:
+                    type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "422":
+          $ref: "#/components/responses/ErrorResponse"
+        "429":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/chat/send:
+    post:
+      tags: [chat]
+      summary: 会話送信（SSE）
+      description: |
+        レスポンスは `text/event-stream`。
+        再接続時の `Last-Event-ID` には対応しない（クライアントは `session_id` で再取得する）。
+        レート制限時は `429` と `Retry-After` ヘッダを返す。
+        `session_id` は `final` イベントで必ず返す。
+        リクエストに `session_id` 未指定の場合は新規発行する。
+        `session_id` 指定時に他ユーザーのセッションを参照した場合は `403` を返す。
+        `final` は1回のみ送信し、`audio_url` と `tts_status` はこの時点で確定する。
+        `final` 送信後にTTS関連の追加イベントは送信しない。
+        イベント種別:
+        - token: テキストチャンク
+        - final: 最終メタ情報（action/audio_url/session_id/message_id/tts_status）
+        - error: エラー
+        - done: ストリーム終了
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatSendRequest"
+      responses:
+        "200":
+          description: SSE stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+              examples:
+                stream:
+                  summary: イベント例
+                  value: |
+                    event: token
+                    data: {"text_chunk":"こんにちは"}
+
+                    event: token
+                    data: {"text_chunk":"、今日はどう？"}
+
+                    event: final
+                    data: {"message_id":"msg_123","session_id":"sess_123","action":"speaking","audio_url":"https://cdn.example.com/audios/a1.mp3","tts_status":"ready"}
+
+                    event: done
+                    data: {}
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "429":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/chat/history:
+    get:
+      tags: [chat]
+      summary: 履歴取得
+      parameters:
+        - in: query
+          name: session_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [messages, total]
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ChatMessage"
+                  total:
+                    type: integer
+                    minimum: 0
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/chat/history/search:
+    get:
+      tags: [chat]
+      summary: 履歴検索
+      parameters:
+        - in: query
+          name: session_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [results, total]
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ChatMessage"
+                  total:
+                    type: integer
+                    minimum: 0
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /api/data/chat-logs/{message_id}:
+    delete:
+      tags: [data]
+      summary: メッセージ削除
+      parameters:
+        - in: path
+          name: message_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/ErrorResponse"
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+
+components:
+  responses:
+    ErrorResponse:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 有効期限24時間のJWT
+  schemas:
+    User:
+      type: object
+      required: [id, auth_provider, created_at]
+      properties:
+        id:
+          type: string
+        auth_provider:
+          type: string
+          enum: [google]
+        created_at:
+          type: string
+          format: date-time
+
+    AuthLoginResponse:
+      type: object
+      required: [user, token, expires_in]
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+        expires_in:
+          type: integer
+          description: トークン有効期限（秒）
+          example: 86400
+
+    OnboardingAnswerRequest:
+      type: object
+      required: [onboarding_session_id, question_id, answer_audio_url]
+      properties:
+        onboarding_session_id:
+          type: string
+        question_id:
+          type: integer
+          minimum: 1
+          maximum: 8
+        answer_text:
+          type: string
+        answer_audio_url:
+          type: string
+
+    Big5AnswerRequest:
+      type: object
+      required: [onboarding_session_id, question_id, choice_value]
+      properties:
+        onboarding_session_id:
+          type: string
+        question_id:
+          type: integer
+          minimum: 1
+          maximum: 10
+        choice_value:
+          type: integer
+          minimum: 1
+          maximum: 7
+
+    Big5ResultResponse:
+      type: object
+      required: [onboarding_session_id, scores_raw, scores, tone, type_code, type_label]
+      properties:
+        onboarding_session_id:
+          type: string
+        scores_raw:
+          type: object
+          required: [openness, conscientiousness, extraversion, agreeableness, neuroticism]
+          properties:
+            openness:
+              type: number
+              format: float
+            conscientiousness:
+              type: number
+              format: float
+            extraversion:
+              type: number
+              format: float
+            agreeableness:
+              type: number
+              format: float
+            neuroticism:
+              type: number
+              format: float
+        scores:
+          type: object
+          required: [openness, conscientiousness, extraversion, agreeableness, neuroticism]
+          properties:
+            openness:
+              type: number
+              format: float
+            conscientiousness:
+              type: number
+              format: float
+            extraversion:
+              type: number
+              format: float
+            agreeableness:
+              type: number
+              format: float
+            neuroticism:
+              type: number
+              format: float
+        tone:
+          type: object
+          required: [formality, energy, directness, warmth]
+          properties:
+            formality:
+              type: number
+              format: float
+            energy:
+              type: number
+              format: float
+            directness:
+              type: number
+              format: float
+            warmth:
+              type: number
+              format: float
+        type_code:
+          type: string
+          enum: [leader, supporter, creator, analyst, communicator, balanced]
+        type_label:
+          type: string
+
+    VoiceCloneStartRequest:
+      type: object
+      required: [onboarding_session_id]
+      properties:
+        onboarding_session_id:
+          type: string
+
+    VoiceCloneStartResponse:
+      type: object
+      required: [job_id, status]
+      properties:
+        job_id:
+          type: string
+        status:
+          type: string
+          enum: [queued, processing, ready, failed]
+
+    VoiceCloneStatusResponse:
+      type: object
+      required: [job_id, status]
+      properties:
+        job_id:
+          type: string
+        status:
+          type: string
+          enum: [queued, processing, ready, failed]
+        voice_profile_ref:
+          type: string
+          nullable: true
+        error_message:
+          type: string
+          nullable: true
+
+    RuntimeStatusResponse:
+      type: object
+      required: [status, model_id]
+      properties:
+        status:
+          type: string
+          enum: [provisioning, running, failed, stopped]
+        model_id:
+          type: string
+        instance_name:
+          type: string
+          nullable: true
+        zone:
+          type: string
+          nullable: true
+        last_error:
+          type: string
+          nullable: true
+
+    PhotoUploadResponse:
+      type: object
+      required: [job_id, status, pipeline_version]
+      properties:
+        job_id:
+          type: string
+        status:
+          type: string
+          enum: [queued, processing, completed, failed]
+        pipeline_version:
+          type: string
+          example: nanobanana2-fullbody-v2
+
+    PixelartJobStatusResponse:
+      type: object
+      required: [status, progress, pipeline_version]
+      properties:
+        status:
+          type: string
+          enum: [queued, processing, completed, failed]
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        pipeline_version:
+          type: string
+          example: nanobanana2-fullbody-v2
+        asset_urls:
+          type: object
+          nullable: true
+          description: completed時のみ返却
+          required: [base_fullbody_png, motion_frame_urls, motion_gif_urls]
+          properties:
+            base_fullbody_png:
+              type: string
+              format: uri
+            motion_frame_urls:
+              type: object
+              description: モーション名をキーにしたPNGフレームURL配列（本番表示はこちらを推奨）
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+                  format: uri
+            motion_gif_urls:
+              type: object
+              description: モーション名をキーにしたGIF URLマップ（プレビュー/互換用）
+              additionalProperties:
+                type: string
+                format: uri
+        error_message:
+          type: string
+          nullable: true
+          description: failed時のみ返却
+
+    ChatSendRequest:
+      type: object
+      required: [text]
+      properties:
+        session_id:
+          type: string
+          nullable: true
+        text:
+          type: string
+          minLength: 1
+        client_request_id:
+          type: string
+          description: クライアント側相関ID（任意）
+
+    ChatMessage:
+      type: object
+      required:
+        - id
+        - session_id
+        - role
+        - text
+        - action
+        - created_at
+      properties:
+        id:
+          type: string
+        session_id:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant]
+        text:
+          type: string
+        action:
+          $ref: "#/components/schemas/ActionType"
+        audio_url:
+          type: string
+          nullable: true
+        tts_status:
+          type: string
+          enum: [ready, skipped, failed]
+          default: skipped
+        created_at:
+          type: string
+          format: date-time
+
+    ActionType:
+      type: string
+      enum: [idle, thinking, speaking, nod, agree, surprised, emphasis]
+
+    ErrorResponse:
+      type: object
+      required: [code, message, request_id]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
