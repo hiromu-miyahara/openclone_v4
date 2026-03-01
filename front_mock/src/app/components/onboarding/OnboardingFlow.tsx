@@ -595,15 +595,16 @@ export function OnboardingFlow() {
 
   return (
     <div className="min-h-screen bg-black text-[#e8e0d4] flex flex-col items-center p-6 relative overflow-hidden">
-      {/* ── ステータスバー（Quest名表示） ── */}
+      {/* ── ステータスバー（Quest名表示・セーフエリアで下にずらす） ── */}
       {stage !== "generating" && (
         <motion.div
           className="absolute top-0 left-0 right-0 z-20"
+          style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="dq-window-sm mx-4 mt-4 px-4 py-2 flex items-center justify-between">
+          <div className="dq-window-sm mx-4 mt-3 px-4 py-2 flex items-center justify-between">
             <span className="text-[10px] font-pixel-accent text-[#f0c040]">
               {getStageLabel(stage, t)}
             </span>
@@ -644,12 +645,12 @@ export function OnboardingFlow() {
         />
       )}
 
-      {/* ── コンテンツ（intro/profile は中央、QUEST3 声の収集以降は上揃え） ── */}
+      {/* ── コンテンツ（intro/profile は中央、QUEST3 声の収集以降は上揃え・ヘッダーとの間隔確保） ── */}
       <div
         className={`relative z-10 max-w-md w-full flex-1 flex flex-col pb-8 ${
           stage === "intro" || stage === "profile"
             ? "justify-center"
-            : "justify-start pt-4"
+            : "justify-start pt-8"
         }`}
       >
         <AnimatePresence mode="wait">
@@ -666,13 +667,13 @@ export function OnboardingFlow() {
           )}
 
           {stage === "big5" && (
-            <motion.div key="big5" exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="-mx-6 -my-6">
+            <motion.div key="big5" exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="-mx-6">
               <Big5Questions onComplete={handleBig5Complete} />
             </motion.div>
           )}
 
           {stage === "big5Result" && (
-            <motion.div key="big5Result" exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="-mx-6 -my-6">
+            <motion.div key="big5Result" exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="-mx-6 mt-4">
               <Big5Result answers={big5Answers} onComplete={handleBig5ResultComplete} />
             </motion.div>
           )}

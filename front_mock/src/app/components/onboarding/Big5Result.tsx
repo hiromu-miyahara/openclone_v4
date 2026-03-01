@@ -111,8 +111,8 @@ export function Big5Result({ answers, onComplete }: Big5ResultProps) {
 
   return (
     <div className="min-h-screen bg-black text-[#e8e0d4] flex flex-col">
-      {/* Header */}
-      <div className="px-6 py-4">
+      {/* Header（親の RESULT バーとの重なり防止で上余白） */}
+      <div className="px-6 pt-2 pb-4">
         <div className="dq-window-sm px-4 py-2">
           <span className="text-[10px] font-pixel-accent text-[#f0c040]">CLASS REVEALED</span>
         </div>
