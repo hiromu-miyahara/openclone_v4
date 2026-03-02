@@ -336,7 +336,7 @@ export function Chat() {
   return (
     <div className="h-[100dvh] bg-black text-[#e8e0d4] flex flex-col relative overflow-hidden">
       {/* ─── Header — RPG HUD ─── */}
-      <div className="relative z-20 shrink-0 px-4 py-3">
+      <div className="relative z-20 shrink-0 px-4 py-3" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}>
         <div className="dq-window-sm px-4 py-2 flex items-center justify-between">
           <span className="text-[10px] font-pixel-accent text-[#f0c040]">
             OpenClone
@@ -465,7 +465,7 @@ export function Chat() {
       )}
 
       {/* ─── Input Area — RPG Command Window ─── */}
-      <div className="relative z-20 shrink-0 px-4 pt-3 pb-4">
+      <div className="relative z-20 shrink-0 px-4 pt-3" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>
         <div className="flex items-center gap-2">
           {isAudioRecording ? (
             <div className="flex-1 flex items-center">
