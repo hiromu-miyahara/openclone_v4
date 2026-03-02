@@ -604,11 +604,11 @@ export function OnboardingFlow() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="dq-window-sm mx-4 mt-3 px-4 py-2 flex items-center justify-between">
-            <span className="text-[10px] font-pixel-accent text-[#f0c040]">
+          <div className="dq-window-sm mx-4 mt-3 px-4 py-2.5 min-h-[2.75rem] flex items-center justify-between">
+            <span className="text-[10px] font-pixel-accent text-[#f0c040] leading-normal">
               {getStageLabel(stage, t)}
             </span>
-            <span className="text-xs text-[#9a9080]">OpenClone</span>
+            <span className="text-xs text-[#9a9080] leading-normal">OpenClone</span>
           </div>
         </motion.div>
       )}
@@ -673,7 +673,7 @@ export function OnboardingFlow() {
           )}
 
           {stage === "big5Result" && (
-            <motion.div key="big5Result" exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="-mx-6 mt-4">
+            <motion.div key="big5Result" exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="-mx-6 mt-6">
               <Big5Result answers={big5Answers} onComplete={handleBig5ResultComplete} />
             </motion.div>
           )}

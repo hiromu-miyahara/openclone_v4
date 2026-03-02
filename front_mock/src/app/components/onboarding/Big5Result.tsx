@@ -111,15 +111,15 @@ export function Big5Result({ answers, onComplete }: Big5ResultProps) {
 
   return (
     <div className="min-h-screen bg-black text-[#e8e0d4] flex flex-col">
-      {/* Header（親の RESULT バーとの重なり防止で上余白） */}
+      {/* Header（親の RESULT バーとの重なり防止・テキスト切れ防止） */}
       <div className="px-6 pt-2 pb-4">
-        <div className="dq-window-sm px-4 py-2">
-          <span className="text-[10px] font-pixel-accent text-[#f0c040]">CLASS REVEALED</span>
+        <div className="dq-window-sm px-4 py-2.5 min-h-[2.75rem] flex items-center">
+          <span className="text-[10px] font-pixel-accent text-[#f0c040] leading-normal">CLASS REVEALED</span>
         </div>
       </div>
 
       {/* Results */}
-      <div className="flex-1 overflow-y-auto px-6 py-8">
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-8 pb-2">
         <div className="w-full max-w-lg mx-auto space-y-6">
           {/* 称号獲得演出 */}
           <motion.div
@@ -140,20 +140,23 @@ export function Big5Result({ answers, onComplete }: Big5ResultProps) {
             </p>
           </motion.div>
 
-          {/* タイプ表示 — DQステータスウィンドウ */}
+          {/* タイプ表示 — DQステータスウィンドウ（説明文の切れ防止） */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
+            className="min-w-0"
           >
-            <div className="dq-window p-6 space-y-4">
+            <div className="dq-window p-6 space-y-4 overflow-visible">
               <div>
                 <p className="text-xs text-[#9a9080] mb-1">{t("big5result.classLabel")}</p>
                 <h3 className="text-2xl font-semibold text-[#f0c040] title-glow">{t(typeMeta.titleKey)}</h3>
               </div>
-              <p className="text-sm leading-7 text-[#e8e0d4]">{t(typeMeta.descKey)}</p>
-              <div className="dq-window-sm px-3 py-2 mt-2">
-                <p className="text-xs text-[#9a9080]">
+              <p className="text-sm leading-relaxed text-[#e8e0d4] break-words">
+                {t(typeMeta.descKey)}
+              </p>
+              <div className="dq-window-sm px-3 py-2.5 mt-2 min-h-[2.5rem] flex items-center">
+                <p className="text-xs text-[#9a9080] leading-normal">
                   {t("big5result.toneLabel")} <span className="text-[#e8e0d4]">{typeMeta.tone}</span>
                 </p>
               </div>
@@ -162,8 +165,8 @@ export function Big5Result({ answers, onComplete }: Big5ResultProps) {
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="px-6 pb-8">
+      {/* Footer（ボタンをコンテンツに近づけてバランス調整） */}
+      <div className="px-6 pt-4 pb-8">
         <div className="w-full max-w-lg mx-auto">
           <button
             onClick={onComplete}
