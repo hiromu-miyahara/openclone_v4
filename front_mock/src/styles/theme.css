@@ -141,10 +141,16 @@
 
   body {
     @apply bg-background text-foreground;
+    overflow: hidden;
+    height: 100%;
+    overscroll-behavior: none;
   }
 
   html {
     font-size: var(--font-size);
+    overflow: hidden;
+    height: 100%;
+    overscroll-behavior: none;
   }
 
   h1 {

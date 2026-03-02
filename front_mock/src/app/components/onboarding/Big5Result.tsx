@@ -110,7 +110,7 @@ export function Big5Result({ answers, onComplete }: Big5ResultProps) {
   const typeMeta = TYPE_META.find((v) => v.id === typeId)!;
 
   return (
-    <div className="min-h-screen bg-black text-[#e8e0d4] flex flex-col">
+    <div className="bg-black text-[#e8e0d4] flex flex-col">
       {/* Header（親の RESULT バーとの重なり防止・テキスト切れ防止） */}
       <div className="px-6 pt-2 pb-4">
         <div className="dq-window-sm px-4 py-2.5 min-h-[2.75rem] flex items-center">
@@ -119,7 +119,7 @@ export function Big5Result({ answers, onComplete }: Big5ResultProps) {
       </div>
 
       {/* Results */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-8 pb-2">
+      <div className="px-6 pt-4 pb-2">
         <div className="w-full max-w-lg mx-auto space-y-6">
           {/* 称号獲得演出 */}
           <motion.div
@@ -166,7 +166,7 @@ export function Big5Result({ answers, onComplete }: Big5ResultProps) {
       </div>
 
       {/* Footer（ボタンをコンテンツに近づけてバランス調整） */}
-      <div className="px-6 pt-4 pb-8">
+      <div className="px-6 pt-4 pb-6">
         <div className="w-full max-w-lg mx-auto">
           <button
             onClick={onComplete}

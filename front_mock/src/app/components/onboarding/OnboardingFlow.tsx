@@ -650,8 +650,13 @@ export function OnboardingFlow() {
         className={`relative z-10 max-w-md w-full flex-1 flex flex-col pb-8 ${
           stage === "intro" || stage === "profile"
             ? "justify-center"
-            : "justify-start pt-8"
+            : "justify-start"
         }`}
+        style={
+          stage !== "intro" && stage !== "profile"
+            ? { paddingTop: "calc(env(safe-area-inset-top, 0px) + 5rem)" }
+            : undefined
+        }
       >
         <AnimatePresence mode="wait">
           {stage === "intro" && (
@@ -673,7 +678,7 @@ export function OnboardingFlow() {
           )}
 
           {stage === "big5Result" && (
-            <motion.div key="big5Result" exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="-mx-6 mt-6">
+            <motion.div key="big5Result" exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="-mx-6">
               <Big5Result answers={big5Answers} onComplete={handleBig5ResultComplete} />
             </motion.div>
           )}
