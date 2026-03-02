@@ -42,7 +42,7 @@ function AppShell() {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <LanguageProvider>
-      <div className="crt-scanlines crt-vignette safe-area-insets min-h-screen">
+      <div className="crt-scanlines crt-vignette safe-area-insets min-h-[100dvh]">
         <AppShell />
       </div>
     </LanguageProvider>

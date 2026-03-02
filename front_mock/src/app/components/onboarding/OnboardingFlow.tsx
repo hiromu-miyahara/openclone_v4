@@ -594,7 +594,7 @@ export function OnboardingFlow() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-black text-[#e8e0d4] flex flex-col items-center p-6 relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-black text-[#e8e0d4] flex flex-col items-center p-6 relative overflow-hidden">
       {/* ── ステータスバー（Quest名表示・セーフエリアで下にずらす） ── */}
       {stage !== "generating" && (
         <motion.div
@@ -654,7 +654,10 @@ export function OnboardingFlow() {
         }`}
         style={
           stage !== "intro" && stage !== "profile"
-            ? { paddingTop: "calc(env(safe-area-inset-top, 0px) + 5rem)" }
+            ? {
+                paddingTop: "calc(env(safe-area-inset-top, 0px) + 5rem)",
+                paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 2rem)",
+              }
             : undefined
         }
       >

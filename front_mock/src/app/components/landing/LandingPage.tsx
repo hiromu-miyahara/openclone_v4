@@ -133,7 +133,7 @@ export function LandingPage() {
   const [taglineDone, setTaglineDone] = useState(false);
 
   return (
-    <div className="min-h-screen bg-black text-[#e8e0d4] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-black text-[#e8e0d4] flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* 星空背景 */}
       <StarField />
 
