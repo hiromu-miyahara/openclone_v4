@@ -338,7 +338,7 @@ export function Chat() {
       {/* ─── Header — RPG HUD ─── */}
       <div className="relative z-20 shrink-0 px-4 py-3" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}>
         <div className="dq-window-sm px-4 py-2 flex items-center justify-between">
-          <span className="text-[10px] font-pixel-accent text-[#f0c040]">
+          <span className="text-xs font-pixel-accent text-[#f0c040]">
             OpenClone
           </span>
           <button
@@ -465,7 +465,7 @@ export function Chat() {
       )}
 
       {/* ─── Input Area — RPG Command Window ─── */}
-      <div className="relative z-20 shrink-0 px-4 pt-3" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>
+      <div className="relative z-20 shrink-0 px-4 pt-3" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 28px)' }}>
         <div className="flex items-center gap-2">
           {isAudioRecording ? (
             <div className="flex-1 flex items-center">

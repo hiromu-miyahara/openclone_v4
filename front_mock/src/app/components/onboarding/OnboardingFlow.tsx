@@ -286,7 +286,7 @@ function VoiceContent({
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs text-[#9a9080]">{t(sceneKeys.toneKey)}</span>
-          <span className="text-sm text-[#f0c040] font-pixel-accent" style={{ fontSize: '10px' }}>
+          <span className="text-[#f0c040] font-pixel-accent" style={{ fontSize: '0.65rem' }}>
             {currentScene + 1}/{VOICE_SCENE_KEYS.length}
           </span>
         </div>
@@ -594,7 +594,7 @@ export function OnboardingFlow() {
   }, [navigate]);
 
   return (
-    <div className="min-h-[100dvh] bg-black text-[#e8e0d4] flex flex-col items-center p-6 relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-black text-[#e8e0d4] flex flex-col items-center p-4 relative overflow-hidden">
       {/* ── ステータスバー（Quest名表示・セーフエリアで下にずらす） ── */}
       {stage !== "generating" && (
         <motion.div
@@ -605,7 +605,7 @@ export function OnboardingFlow() {
           transition={{ duration: 0.5 }}
         >
           <div className="dq-window-sm mx-4 mt-3 px-4 py-2.5 min-h-[2.75rem] flex items-center justify-between">
-            <span className="text-[10px] font-pixel-accent text-[#f0c040] leading-normal">
+            <span className="text-xs font-pixel-accent text-[#f0c040] leading-normal">
               {getStageLabel(stage, t)}
             </span>
             <span className="text-xs text-[#9a9080] leading-normal">OpenClone</span>
